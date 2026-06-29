@@ -1,0 +1,14 @@
+{
+  "name": "bazi-ziwei-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "八字+紫微斗数综合命盘生成器 — Cloudflare Pages 部署",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Static site, no build needed'",
+    "dev": "echo 'Run `npx wrangler pages dev` for local preview'"
+  },
+  "dependencies": {
+    "lunar-typescript": "^1.8.6"
+  }
+}
