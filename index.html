@@ -204,6 +204,15 @@ function submitForm() {
     payload.aiModel = document.getElementById("aiModel").value || undefined;
   }
 
+  const w = window.open("", "_blank");
+  if (!w) {
+    error.textContent = "请允许弹窗后重试";
+    error.style.display = "block";
+    btn.disabled = false;
+    loading.style.display = "none";
+    return false;
+  }
+
   (async () => {
     try {
       const resp = await fetch("/api/chart", {
@@ -225,14 +234,7 @@ function submitForm() {
       }
 
       // 在新窗口中打开海报
-      const w = window.open("", "_blank");
-      if (!w) {
-        error.textContent = "请允许弹窗后重试";
-        error.style.display = "block";
-        btn.disabled = false;
-        loading.style.display = "none";
-        return;
-      }
+
       w.document.write(posterHtml);
       w.document.close();
 
