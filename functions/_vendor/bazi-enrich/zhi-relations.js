@@ -125,7 +125,7 @@ export function detectZhiRelations(zhis) {
     // 暗合 — 地支藏干相合
     // 规则: 仅在该地支对没有其他显式关系(六冲/六合/六害/三合/三会/拱合/拱会/相刑)时才报暗合
     const explicitTypes = ['六冲', '六合', '六害', '三合', '三会', '拱合', '拱会', '相刑', '自刑'];
-export     function hasExplicit(za, zb) {
+    function hasExplicit(za, zb) {
         return out.some(r => explicitTypes.includes(r.type) &&
             r.zhi.includes(za) && r.zhi.includes(zb));
     }
