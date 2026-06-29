@@ -1,12 +1,9 @@
 /**
  * Cloudflare Pages Function — POST /api/chart
  *
- * 输入: { year, month, day, hour, minute, gender, aiProvider?, aiApiKey?, aiBaseUrl?, aiModel? }
- * 输出: {
- *   html: "海报 HTML",
- *   analysisMd: "长文分析 Markdown (如提供 API Key)",
- *   chart: "排盘关键数据摘要"
- * }
+ * 输入: { year, month, day, hour, minute, gender, aiMode?, aiProvider?, aiApiKey?, aiBaseUrl?, aiModel? }
+ * aiMode: "none"(默认) | "site"(用环境变量) | "custom"(用请求体Key)
+ * 输出: { html: "完整海报 HTML(含AI分析如有)" }
  */
 
 import { createChart } from "../_vendor/yiqi-core/index.js";
@@ -30,8 +27,29 @@ function getShiShen(dm, g) { return SHI_SHEN_MAP[dm]?.[g] || ""; }
 function getYearGanZhi(year) { const gs=["庚","辛","壬","癸","甲","乙","丙","丁","戊","己"], zs=["申","酉","戌","亥","子","丑","寅","卯","辰","巳","午","未"]; return gs[year%10]+zs[year%12]; }
 function calcBarPct(v) { return {0:"0",1:"12",2:"25",3:"40",4:"55",5:"72",6:"88",7:"100"}[v] || String(Math.min(100,v*15)); }
 
+// ======== Markdown → HTML(简易) ========
+function renderMarkdown(md) {
+  if (!md) return "";
+  let html = md
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/置信度[：:]\s*高/g, '<span class="confidence-high">置信度：高</span>')
+    .replace(/置信度[：:]\s*中/g, '<span class="confidence-mid">置信度：中</span>')
+    .replace(/置信度[：:]\s*低/g, '<span class="confidence-low">置信度：低</span>')
+    .replace(/^(\d+)\.\s(.+)$/gm, '<li>$1. $2</li>')
+    .replace(/^-\s(.+)$/gm, '<li>$1</li>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  return '<p>' + html + '</p>';
+}
+
 // ======== 海报渲染 ========
-function renderPoster(template, chart, analysis) {
+function renderPoster(template, chart, analysis, aiAnalysisMd) {
   const data = {};
   const currentYear = new Date().getFullYear();
   const bi = chart.bazi.birthInfo, bz = chart.bazi, zw = chart.ziwei, en = bz.enrichment;
@@ -57,43 +75,107 @@ function renderPoster(template, chart, analysis) {
   data["core.wangshuai_verdict"] = en?.旺衰?.verdict||"-"; data["core.wangshuai_score"] = String(en?.旺衰?.score??0);
   const ws=en?.旺衰?.score??0; data["core.wangshuai_pos_pct"] = String(Math.max(0,Math.min(100,Math.round((ws+10)*5))));
   const tc=en?.调候用神||[]; data["core.tiaohou.0"]=tc[0]||"-"; data["core.tiaohou.1"]=tc[1]||"-"; data["core.tiaohou_confidence"]="高";
-  const wxs=en?.五行旺相||{}; for(const e of["木","火","土","金","水"]) data["core.yueling."+e]=wxs[e]||"-";
-  const wStat=en?.五行统计?.surface||en?.五行统计||{}; for(const e of["木","火","土","金","水"]) { data["core.wuxing."+e]=String(wStat[e]??0); data["core.wuxing_pct."+e]=calcBarPct(wStat[e]??0); }
 
-  // 四柱
-  const sz=bz.siZhu||{}, CG=bz.cangGan||{};
-  for(const[k,l]of Object.entries({year:"年",month:"月",day:"日",hour:"时"})){const p=sz[k]||{}; data["bazi."+k+".gan"]=p.gan||"-";data["bazi."+k+".zhi"]=p.zhi||"-";data["bazi."+k+".naYin"]=bz.naYin?.[k]||"-";data["bazi."+k+".shiShen"]=bz.shiShen?.[k]||"";data["bazi."+k+".zhangSheng"]=bz.zhangSheng?.[k]||"-";data["bazi."+k+".ziZuo"]=en?.自坐?.[k]||"-";const cg=CG[k]||[];data["bazi."+k+".cangGanHtml"]=cg.map((g,i)=>i===0?g+"<small>"+getShiShen(bz.dayMaster,g)+"</small>":g+"<small>"+getShiShen(bz.dayMaster,g)+"</small>").join("")||"-";}
-  data["bazi.dayunStart"]=String(bz.dayunStart??0);
+  // SIZHU
+  for (const p of ["year","month","day","hour"]) {
+    const s = bz.siZhu[p];
+    data["sizhu."+p+".gan"]=s.gan||"-"; data["sizhu."+p+".zhi"]=s.zhi||"-";
+    data["sizhu."+p+".nayin"]=s.nayin||"-"; data["sizhu."+p+".cangGan"]=(s.cangGan||[]).map(c=>c.gan||c).join(",");
+    data["sizhu."+p+".shishen"]=getShiShen(bz.dayMaster, s.gan);
+    data["sizhu."+p+".changSheng"]=s.changSheng||"-";
+  }
 
-  // 十二宫
-  for(let i=0;i<zw.gongs.length;i++){const g=zw.gongs[i];if(!g)continue;const dz=g.dizhi;data["gongs."+dz+".name"]=g.gong;data["gongs."+dz+".ganzhi"]=(g.tiangan||"")+(g.dizhi||"");data["gongs."+dz+".mainStarsHtml"]=(g.mainStars||[]).map(s=>{const h=(g.sihua||[]).find(x=>x.star===s);return h?s+"<small>"+h.hua+"</small>":s;}).join(" ")||"无主星";data["gongs."+dz+".auxStars"]=(g.auxStars||[]).join(" ");data["gongs."+dz+".smallStars"]="";data["gongs."+dz+".daxian_range"]=g.daXian?g.daXian.startAge+"-"+g.daXian.endAge:"";data["gongs."+dz+".flag"]=g.daXian?.isCurrent?"★":"";data["gongs."+dz+".shenBadge"]=i===zw.shenGongIndex?"身":"";}
+  // SHENG KE
+  const sc = analysis.shengKe || {};
+  data["shengke.wood"]=String(sc["木"]||0); data["shengke.fire"]=String(sc["火"]||0); data["shengke.earth"]=String(sc["土"]||0);
+  data["shengke.metal"]=String(sc["金"]||0); data["shengke.water"]=String(sc["水"]||0);
+  data["shengke.wood_pct"]=calcBarPct(sc["木"]||0); data["shengke.fire_pct"]=calcBarPct(sc["火"]||0);
+  data["shengke.earth_pct"]=calcBarPct(sc["土"]||0); data["shengke.metal_pct"]=calcBarPct(sc["金"]||0);
+  data["shengke.water_pct"]=calcBarPct(sc["水"]||0);
 
-  // 大运+流年
-  const dayun=bz.dayun||[];
-  for(let i=0;i<Math.min(10,dayun.length);i++){const d=dayun[i];const as=(bz.dayunStart||1)+i*10;data["dayun."+i+".gz"]=(d.ganZhi?.gan||"")+(d.ganZhi?.zhi||"");data["dayun."+i+".shishen"]=(d.ganShiShen||"")+"/"+(d.zhiShiShen||"");data["dayun."+i+".age_range"]=as+"-"+(as+9);data["dayun."+i+".current_class"]=(d.startYear<=currentYear&&d.endYear>=currentYear)?"current":"";}
-  data["liunian_dayun_label"]="大运：乙丑（七杀/比肩）";
-  for(let i=0;i<10;i++){const y=currentYear-4+i;data["liunian."+i+".year"]=String(y);data["liunian."+i+".age"]=String(y-bi.year+1);data["liunian."+i+".current_class"]=y===currentYear?"current":"";const ygz=getYearGanZhi(y);data["liunian."+i+".gz"]=ygz;data["liunian."+i+".shishen"]=getShiShen(bz.dayMaster,ygz[0]);}
+  // ENRICH
+  const zz = en?.整柱||[]; for (let i=0;i<4;i++) { const z=zz[i]; const p=["年","月","日","时"][i]; data["enrich.whole."+p]=z?.verdict||"-"; }
+  const tr = en?.天干关系||[]; data["enrich.gan_relations"] = tr.map(r=>r.type).join(",") || "-";
+  const zr = en?.地支关系||[]; data["enrich.zhi_relations"] = zr.map(r=>r.type).join(",") || "-";
 
-  // section_02
-  for(let i=0;i<Math.min(7,dayun.length);i++){const d=dayun[i];const as=(bz.dayunStart||1)+i*10;data["section_02.bazi."+i+".range"]=as+"-"+(as+9)+"岁";data["section_02.bazi."+i+".gz"]=(d.ganZhi?.gan||"")+(d.ganZhi?.zhi||"");data["section_02.bazi."+i+".shishen"]=(d.ganShiShen||"")+"/"+(d.zhiShiShen||"");data["section_02.bazi."+i+".current_class"]=(d.startYear<=currentYear&&d.endYear>=currentYear)?"current":"";}
-  for(let i=0;i<Math.min(7,zw.gongs.length);i++){const g=zw.gongs[i];data["section_02.ziwei."+i+".range"]=g?.daXian?g.daXian.startAge+"-"+g.daXian.endAge+"岁":"";data["section_02.ziwei."+i+".current_class"]=g?.daXian?.isCurrent?"current":"";}
+  // ANALYSIS
+  const dims = analysis.dims || [];
+  for (const d of dims) {
+    const key = d.key || "unknown";
+    data["analysis."+key+".bazi"]=d.bazi||""; data["analysis."+key+".ziwei"]=d.ziwei||"";
+    data["analysis."+key+".verdict"]=d.verdict||""; data["analysis."+key+".verdict_class"]=d.verdict_class||"";
+    data["analysis."+key+".fused"]=d.fused||"";
+  }
+  const conflicts = analysis.conflicts || [];
+  data["analysis.conflict_count"]=String(conflicts.length);
+  for (let i=0;i<Math.min(conflicts.length,6);i++) {
+    const c=conflicts[i];
+    data["analysis.conflict."+i+".point"]=c.point||""; data["analysis.conflict."+i+".bazi"]=c.bazi||"";
+    data["analysis.conflict."+i+".ziwei"]=c.ziwei||""; data["analysis.conflict."+i+".impact"]=c.impact||"";
+    data["analysis.conflict."+i+".impact_class"]=c.impact_class||""; data["analysis.conflict."+i+".advice"]=c.advice||"";
+  }
 
-  // 分析数据
-  const a=analysis;
-  if(a.meta){data["meta.archetype_name"]=a.meta.archetype_name||"";data["meta.axis_oneliner"]=a.meta.axis_oneliner||"";}
-  if(a.axes){data["axes.bazi_main"]=a.axes.bazi_main||"";data["axes.ziwei_main"]=a.axes.ziwei_main||"";}
-  data["ziwei.consistency"]=a.consistency||"";
-  for(let i=0;i<3;i++){const s=a.strengths?.[i]||{};data["strengths."+i+".title"]=s.title||"";data["strengths."+i+".desc"]=s.desc||"";const w=a.weaknesses?.[i]||{};data["weaknesses."+i+".title"]=w.title||"";data["weaknesses."+i+".desc"]=w.desc||"";}
-  data["section_01.text"]=a.section_01?.text||"";data["section_01.word_count"]=String(a.section_01?.word_count??0);data["section_02.conclusion"]=a.section_02?.conclusion||"";
-  for(const k of["career","wealth","marriage","children","family","health"]){const d=a.dim?.[k]||{};data["dim."+k+".bazi"]=d.bazi||"";data["dim."+k+".ziwei"]=d.ziwei||"";data["dim."+k+".verdict"]=d.verdict||"";data["dim."+k+".verdict_class"]=d.verdict_class||"verdict-yes";data["dim."+k+".fused"]=d.fused||"";}
-  for(let i=0;i<3;i++){const c=a.conflicts?.[i]||{};for(const f of["point","bazi","ziwei","impact","impact_class","advice"])data["conflicts."+i+"."+f]=c[f]!==undefined?String(c[f]):"";}
-  if(a.final){data["final.life_axis"]=a.final.life_axis||"";for(let i=0;i<5;i++){const n=a.final.nodes?.[i]||{};data["final.nodes."+i+".age"]=n.age!==undefined?String(n.age):"";data["final.nodes."+i+".year"]=n.year!==undefined?String(n.year):"";data["final.nodes."+i+".event"]=n.event||"";}for(let i=0;i<3;i++){const r=a.final.risks?.[i]||{};data["final.risks."+i+".range"]=r.range||"";data["final.risks."+i+".desc"]=r.desc||"";}for(let i=0;i<2;i++){const l=a.final.leverage?.[i]||{};data["final.leverage."+i+".title"]=l.title||"";data["final.leverage."+i+".desc"]=l.desc||"";}for(let i=0;i<4;i++)data["final.advice."+i]=a.final.advice?.[i]||"";}
-  if(a.confidence){for(const k of["bazi","ziwei","consistency","stability"]){data["confidence."+k+"_level"]=a.confidence[k+"_level"]||"";data["confidence."+k+"_score"]=a.confidence[k+"_score"]!==undefined?String(a.confidence[k+"_score"]):"";}data["confidence.note"]=a.confidence.note||"";}
+  // ZIWEI GONGS
+  for (const g of zw.gongs) {
+    const gi = g.gong || String(g.index);
+    data["ziwei."+gi+".mainStars"]=(g.mainStars||[]).join(" ");
+    data["ziwei."+gi+".auxStars"]=(g.auxStars||[]).join(" ");
+    data["ziwei."+gi+".sihua"]=(g.sihua||[]).map(s=>s.hua||"").join(" ");
+    data["ziwei."+gi+".dizhi"]=DIZHI[g.dizhiIndex]||"-";
+  }
 
-  // 替换
+  data["ziwei.mingGong"] = zw.gongs[zw.mingGongIndex]?.gong || "-";
+  data["ziwei.shenGong"] = DIZHI[zw.shenGongIndex] || "-";
+
+  // DAYUN
+  const dy = zw.dayun || [];
+  data["dayun.count"] = String(dy.length);
+  const nowY = new Date().getFullYear(); let dyIdx = -1;
+  for (let i=0;i<dy.length;i++) { if (dy[i].startYear<=nowY && dy[i].endYear>=nowY) { dyIdx=i; break; } }
+  data["dayun.current"] = dyIdx>=0 ? (dy[dyIdx].ganZhi?.gan||"")+(dy[dyIdx].ganZhi?.zhi||"") : "-";
+
+  // DAXIAN
+  const dx = zw.daxian || [];
+  data["daxian.count"] = String(dx.length);
+  let dxIdx = -1;
+  for (let i=0;i<dx.length;i++) { if (dx[i].startAge<=data["meta.age_virtual"] && dx[i].endAge>=data["meta.age_virtual"]) { dxIdx=i; break; } }
+  if (dxIdx>=0) { data["daxian.current"] = (dx[dxIdx].gong||"")+" "+DIZHI[dx[dxIdx].dizhiIndex||0]; } else { data["daxian.current"] = "-"; }
+
+  // 渲染模板
   let html = template;
-  for(const[k,v]of Object.entries(data)){const re=new RegExp("\\{\\{"+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\}\\}","g");html=html.replace(re,String(v??""));}
+  for (const [k,v] of Object.entries(data)) {
+    html = html.replace(new RegExp("\\{\\{"+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"\\}\\}","g"), String(v||""));
+  }
   html = html.replace(/\{\{[a-zA-Z0-9_.]+\}\}/g, "-");
+
+  // 如果有 AI 分析，插入到海报底部
+  if (aiAnalysisMd) {
+    const aiHtml = `
+<div style="margin: 40px 0 20px; padding: 24px 20px; background: #faf6ec; border: 1px solid #c4bdb0; border-radius: 8px;">
+  <h2 style="font-size: 20px; color: #8b2f1e; letter-spacing: 3px; text-align: center; margin-bottom: 20px; border-bottom: 1px solid #e0d9c8; padding-bottom: 10px;">🤖 AI 深度综合分析</h2>
+  <div class="analysis-content" style="line-height: 1.9; font-size: 14px;">
+    ${renderMarkdown(aiAnalysisMd)}
+  </div>
+</div>`;
+    html = html.replace("</body>", aiAnalysisMd ? aiHtml + "</body>" : "</body>");
+    // 也插入分析样式
+    const aiCss = `
+.ai-section { margin: 40px 0 20px; padding: 24px 20px; background: var(--paper-card,#faf6ec); border: 1px solid var(--line,#c4bdb0); border-radius: 8px; }
+.ai-section h2 { font-size: 20px; color: var(--vermillion-deep,#8b2f1e); text-align:center; letter-spacing:3px; margin-bottom:20px; border-bottom: 1px solid var(--line,#e0d9c8); padding-bottom: 10px; }
+.analysis-content { line-height:1.9; font-size:14px; }
+.analysis-content h1,.analysis-content h2,.analysis-content h3 { color: var(--vermillion,#8b2f1e); margin: 16px 0 8px; }
+.analysis-content h2 { font-size: 18px; border-bottom: 1px solid var(--line,#e0d9c8); padding-bottom: 4px; }
+.analysis-content h3 { font-size: 15px; }
+.analysis-content p { margin: 8px 0; }
+.analysis-content hr { border: none; border-top: 1px solid var(--line,#e0d9c8); margin: 16px 0; }
+.analysis-content blockquote { border-left: 3px solid var(--line,#c4bdb0); padding-left: 12px; color: var(--ink-soft,#6b6660); margin: 8px 0; }
+.confidence-high { color: #4a7c4e; }
+.confidence-mid { color: #c97c3a; }
+.confidence-low { color: #c1432f; }
+`;
+    html = html.replace("</head>", "<style>" + aiCss + "</style></head>");
+  }
+
   return html;
 }
 
@@ -152,17 +234,27 @@ async function onRequest(context) {
 
   try {
     const body = await request.json();
-    const { year, month, day, hour, minute, gender, aiProvider, aiApiKey, aiBaseUrl, aiModel } = body;
+    const { year, month, day, hour, minute, gender, aiMode, aiProvider, aiApiKey, aiBaseUrl, aiModel } = body;
 
     if (!year || !month || !day || hour===undefined || minute===undefined || !gender) {
       return new Response(JSON.stringify({ error: "缺少必填参数" }), { status: 400, headers: { "Content-Type": "application/json;charset=utf-8" } });
     }
 
-    // 解析 API Key 优先级: 请求体 > 环境变量
-    const resolvedApiKey = aiApiKey || env.AI_API_KEY || "";
-    const resolvedProvider = aiProvider || env.AI_PROVIDER || "deepseek";
-    const resolvedBaseUrl = aiBaseUrl || env.AI_BASE_URL || "";
-    const resolvedModel = aiModel || env.AI_MODEL || "";
+    const mode = aiMode || "none";
+
+    // 解析 AI Key
+    let resolvedApiKey = "", resolvedProvider = "deepseek", resolvedBaseUrl = "", resolvedModel = "";
+    if (mode === "site") {
+      resolvedApiKey = env.AI_API_KEY || "";
+      resolvedProvider = env.AI_PROVIDER || "deepseek";
+      resolvedBaseUrl = env.AI_BASE_URL || "";
+      resolvedModel = env.AI_MODEL || "";
+    } else if (mode === "custom") {
+      resolvedApiKey = aiApiKey || "";
+      resolvedProvider = aiProvider || "deepseek";
+      resolvedBaseUrl = aiBaseUrl || "";
+      resolvedModel = aiModel || "";
+    }
 
     const birthInfo = {
       year: parseInt(year), month: parseInt(month), day: parseInt(day),
@@ -171,10 +263,8 @@ async function onRequest(context) {
       isLunar: false, timeZone: 8
     };
 
-    // 排盘
+    // 排盘 + 规则分析
     const chart = doChart(birthInfo);
-
-    // 规则分析 + 海报渲染
     const analysis = generateAnalysis(chart);
     let template;
     try {
@@ -183,34 +273,25 @@ async function onRequest(context) {
     } catch {
       return new Response(JSON.stringify({ error: "模板加载失败" }), { status: 500, headers: { "Content-Type": "application/json;charset=utf-8" } });
     }
-    const html = renderPoster(template, chart, analysis);
 
-    // AI 长文分析 (如有 API Key)
-    let analysisMd = "";
+    // AI 长文分析
+    let aiAnalysisMd = "";
     if (resolvedApiKey) {
       try {
         const currentYear = new Date().getFullYear();
         const chartText = chartToText(chart);
         const systemPrompt = buildSystemPrompt();
         const userPrompt = buildUserPrompt(chartText, birthInfo, currentYear);
-        analysisMd = await callAiApi(resolvedProvider, resolvedApiKey, resolvedBaseUrl, resolvedModel, systemPrompt, userPrompt);
+        aiAnalysisMd = await callAiApi(resolvedProvider, resolvedApiKey, resolvedBaseUrl, resolvedModel, systemPrompt, userPrompt);
       } catch (aiErr) {
-        analysisMd = "⚠️ AI 分析失败: " + aiErr.message;
+        aiAnalysisMd = "⚠️ AI 分析失败: " + aiErr.message;
       }
     }
 
-    // 排盘摘要
-    const en = chart.bazi.enrichment;
-    const summary = {
-      dayMaster: chart.bazi.dayMaster,
-      siZhu: chart.bazi.siZhu,
-      geju: en?.格局?.primary || "",
-      wangshuai: en?.旺衰?.verdict || "",
-      tiaohou: (en?.调候用神||[]).join(","),
-      mingGong: chart.ziwei.gongs[chart.ziwei.mingGongIndex]?.gong + " " + (chart.ziwei.gongs[chart.ziwei.mingGongIndex]?.mainStars||[]).join(" "),
-    };
+    // 渲染海报（AI 分析会嵌入海报底部）
+    const html = renderPoster(template, chart, analysis, aiAnalysisMd);
 
-    return new Response(JSON.stringify({ html, analysisMd, chart: summary }), {
+    return new Response(JSON.stringify({ html }), {
       status: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" }
     });

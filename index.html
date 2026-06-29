@@ -8,12 +8,8 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, "Noto Serif SC", "Source Han Serif SC", STSong, serif;
-    background: #f5f1e8;
-    color: #2b2825;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    background: #f5f1e8; color: #2b2825;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
     padding: 40px 16px 60px;
   }
   .container { max-width: 580px; width: 100%; }
@@ -27,16 +23,17 @@
   .form-group input, .form-group select {
     width: 100%; padding: 9px 10px; border: 1px solid #c4bdb0; border-radius: 6px;
     background: #fffcf5; font-size: 14px; font-family: inherit; color: #2b2825;
-    transition: border-color .2s;
   }
   .form-group input:focus, .form-group select:focus { outline: none; border-color: #8b2f1e; }
-  .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6660'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
-  .form-group .small-hint { font-size: 10px; color: #a8a298; margin-top: 2px; }
+  .form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6660'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+  }
 
   .btn-submit {
     width: 100%; padding: 14px; background: #8b2f1e; color: #fff; border: none; border-radius: 6px;
-    font-size: 16px; font-family: inherit; letter-spacing: 2px; cursor: pointer;
-    transition: background .2s; margin-top: 4px;
+    font-size: 16px; font-family: inherit; letter-spacing: 2px; cursor: pointer; margin-top: 4px;
   }
   .btn-submit:hover { background: #6b2013; }
   .btn-submit:disabled { background: #c4bdb0; cursor: not-allowed; }
@@ -46,326 +43,210 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   .error-msg { display: none; padding: 14px; background: #fdf2f0; border: 1px solid #e0b0a8; border-radius: 6px; color: #8b2f1e; margin-bottom: 12px; font-size: 13px; }
 
-  .result { display: none; }
-  .result-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 2px solid #e0d9c8; }
-  .result-tab { padding: 10px 20px; cursor: pointer; font-size: 13px; letter-spacing: 1px; color: #6b6660; border: none; background: none; font-family: inherit; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .2s; }
-  .result-tab:hover { color: #2b2825; }
-  .result-tab.active { color: #8b2f1e; border-bottom-color: #8b2f1e; font-weight: bold; }
-  .result-tab .badge { background: #8b2f1e; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 8px; margin-left: 4px; }
-  .result-content { display: none; padding: 16px 0; }
-  .result-content.active { display: block; }
-  .result-content iframe { width: 100%; border: 1px solid #e0d9c8; border-radius: 6px; min-height: 600px; }
-  .analysis-content {
-    background: #fffcf5; border: 1px solid #e0d9c8; border-radius: 6px; padding: 20px;
-    line-height: 1.8; max-height: 800px; overflow-y: auto;
-    font-size: 14px;
-  }
-  .analysis-content h1, .analysis-content h2, .analysis-content h3 { color: #8b2f1e; margin: 16px 0 8px; }
-  .analysis-content h2 { font-size: 18px; border-bottom: 1px solid #e0d9c8; padding-bottom: 4px; }
-  .analysis-content h3 { font-size: 15px; }
-  .analysis-content p { margin: 8px 0; }
-  .analysis-content hr { border: none; border-top: 1px solid #e0d9c8; margin: 16px 0; }
-  .analysis-content blockquote { border-left: 3px solid #c4bdb0; padding-left: 12px; color: #6b6660; margin: 8px 0; }
-  .analysis-content .confidence-high { color: #4a7c4e; }
-  .analysis-content .confidence-mid { color: #c97c3a; }
-  .analysis-content .confidence-low { color: #c1432f; }
-  .analysis-content table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 13px; }
-  .analysis-content th, .analysis-content td { border: 1px solid #e0d9c8; padding: 6px 10px; text-align: left; }
-  .analysis-content th { background: #f0ebe0; }
-  .no-ai-msg { text-align: center; padding: 60px 20px; color: #a8a298; }
-  .no-ai-msg .icon { font-size: 48px; margin-bottom: 12px; }
-  .no-ai-msg p { font-size: 14px; margin-bottom: 8px; }
-  .result-actions { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-  .result-actions button {
-    padding: 8px 18px; border: 1px solid #c4bdb0; border-radius: 4px;
-    background: #faf6ec; font-size: 12px; color: #2b2825; cursor: pointer;
-    font-family: inherit; transition: all .2s;
-  }
-  .result-actions button:hover { background: #e0d9c8; border-color: #8b2f1e; }
-  .footer { margin-top: 32px; text-align: center; font-size: 11px; color: #a8a298; line-height: 1.8; }
-  .footer a { color: #8b2f1e; text-decoration: none; }
-  @media (max-width: 480px) {
-    body { padding: 24px 12px; }
-    .form-row { flex-direction: column; gap: 10px; }
-    .card { padding: 20px 16px; }
-    .result-tab { padding: 8px 12px; font-size: 12px; }
-  }
+  /* AI 选项 */
+  .ai-option { display: block; padding: 10px 14px; margin-bottom: 8px; border: 1px solid #e0d9c8; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all .2s; }
+  .ai-option:hover { border-color: #c4bdb0; background: #faf5eb; }
+  .ai-option.selected { border-color: #8b2f1e; background: #fdf5f2; }
+  .ai-option input[type=radio] { margin-right: 8px; accent-color: #8b2f1e; }
+  .ai-option .desc { display: block; font-size: 11px; color: #a8a298; margin-top: 2px; margin-left: 22px; }
+
+  .ai-fields { display: none; margin-top: 10px; padding-top: 12px; border-top: 1px solid #e0d9c8; }
+  .ai-fields.visible { display: block; }
+  .ai-fields .form-group { margin-bottom: 10px; }
+  .ai-note { font-size: 11px; color: #a8a298; padding: 8px 0; }
 </style>
 </head>
 <body>
+
 <div class="container">
-  <h1>八字 · 紫微</h1>
-  <div class="sub">综合命盘生成 · 算法排盘 · 规则 + AI 分析</div>
+  <h1>八字+紫微 · 综合命盘</h1>
+  <p class="sub">算法排盘 · 规则分析 · AI 深度印证</p>
 
   <!-- 生辰表单 -->
   <div class="card">
-    <div class="card-title">📅 出生信息</div>
-    <form id="chartForm" onsubmit="return submitChart(event)">
+    <div class="card-title">📅 生辰信息</div>
+    <form id="chartForm" onsubmit="return submitForm()">
       <div class="form-row">
-        <div class="form-group"><label>年份</label><input type="number" id="year" value="2000" min="1900" max="2100" required></div>
-        <div class="form-group"><label>月份</label><input type="number" id="month" value="1" min="1" max="12" required></div>
-        <div class="form-group"><label>日期</label><input type="number" id="day" value="1" min="1" max="31" required></div>
+        <div class="form-group" style="flex:2">
+          <label>出生日期（公历）</label>
+          <input type="date" id="birthDate" required>
+        </div>
+        <div class="form-group">
+          <label>时辰</label>
+          <select id="birthHour" required>
+            <option value="0">子时 0:00</option><option value="1">丑时 1:00</option><option value="2">丑时 2:00</option>
+            <option value="3">寅时 3:00</option><option value="4">寅时 4:00</option><option value="5">卯时 5:00</option>
+            <option value="6">卯时 6:00</option><option value="7">辰时 7:00</option><option value="8">辰时 8:00</option>
+            <option value="9">巳时 9:00</option><option value="10">巳时 10:00</option><option value="11">午时 11:00</option>
+            <option value="12" selected>午时 12:00</option>
+            <option value="13">未时 13:00</option><option value="14">未时 14:00</option><option value="15">申时 15:00</option>
+            <option value="16">申时 16:00</option><option value="17">酉时 17:00</option><option value="18">酉时 18:00</option>
+            <option value="19">戌时 19:00</option><option value="20">戌时 20:00</option><option value="21">亥时 21:00</option>
+            <option value="22">亥时 22:00</option><option value="23">子时 23:00</option>
+          </select>
+        </div>
+        <div class="form-group" style="max-width:80px">
+          <label>性别</label>
+          <select id="gender" required>
+            <option value="male">男</option>
+            <option value="female">女</option>
+          </select>
+        </div>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label>小时 (0-23)</label><input type="number" id="hour" value="12" min="0" max="23" required></div>
-        <div class="form-group"><label>分钟</label><input type="number" id="minute" value="0" min="0" max="59" required></div>
-        <div class="form-group"><label>性别</label><select id="gender"><option value="男">男</option><option value="女">女</option></select></div>
-      </div>
-      <button type="submit" class="btn-submit" id="submitBtn">生成命盘</button>
-    </form>
-  </div>
 
-  <!-- AI 设置 (可折叠) -->
-  <div class="card" style="padding:16px 24px">
-    <details>
-      <summary style="cursor:pointer;font-size:13px;color:#6b6660;letter-spacing:1px">
-        ⚙️ AI 长文分析设置（可选）
-      </summary>
-      <div style="margin-top:12px">
+      <!-- AI 分析设置 -->
+      <div class="card-title" style="margin-top:8px;">🤖 AI 长文分析设置（可选）</div>
+
+      <label class="ai-option selected" id="optNone">
+        <input type="radio" name="aiMode" value="none" checked onchange="switchAiMode('none')">
+        不使用 AI 分析
+        <span class="desc">仅生成算法规则版海报，响应最快，零成本</span>
+      </label>
+      <label class="ai-option" id="optSite">
+        <input type="radio" name="aiMode" value="site" onchange="switchAiMode('site')">
+        使用网站提供的 AI 分析
+        <span class="desc">由网站管理员配置的 API 调用，稳定性取决于配额</span>
+      </label>
+      <label class="ai-option" id="optCustom">
+        <input type="radio" name="aiMode" value="custom" onchange="switchAiMode('custom')">
+        自定义 AI 分析
+        <span class="desc">使用你自己的 API Key，本站不会保存</span>
+      </label>
+
+      <!-- 自定义 AI 字段 -->
+      <div class="ai-fields" id="aiFields">
         <div class="form-row">
           <div class="form-group">
             <label>AI 提供商</label>
             <select id="aiProvider">
-              <option value="">不使用 AI 分析（仅规则版海报）</option>
-              <option value="nvidia">Nvidia NIM (免费，需注册)</option>
-              <option value="deepseek">DeepSeek (收费)</option>
-              <option value="openai">OpenAI (收费)</option>
-              <option value="custom">自定义 API</option>
+              <option value="deepseek">DeepSeek</option>
+              <option value="openai">OpenAI</option>
+              <option value="nvidia">Nvidia NIM（免费）</option>
+              <option value="custom">自定义</option>
             </select>
           </div>
-        </div>
-        <div class="form-row" id="customModelRow" style="display:none">
-          <div class="form-group">
-            <label>模型名称</label>
-            <input type="text" id="aiModel" placeholder="如: gpt-4o-mini">
-          </div>
-          <div class="form-group">
-            <label>API 地址</label>
-            <input type="text" id="aiBaseUrl" placeholder="https://api.example.com/v1">
+          <div class="form-group" style="flex:2">
+            <label>API Key</label>
+            <input type="password" id="aiApiKey" placeholder="sk-...">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group" style="flex:2">
-            <label>API Key</label>
-            <input type="password" id="aiApiKey" placeholder="留空则仅生成规则海报">
-            <div class="small-hint">如需 AI 长文分析，请输入 API Key。后台也可全局设置。</div>
+            <label>API Base URL（可选）</label>
+            <input type="text" id="aiBaseUrl" placeholder="默认自动匹配">
+          </div>
+          <div class="form-group">
+            <label>模型名（可选）</label>
+            <input type="text" id="aiModel" placeholder="默认自动匹配">
           </div>
         </div>
       </div>
-    </details>
+
+      <div id="errorMsg" class="error-msg"></div>
+      <button type="submit" class="btn-submit" id="submitBtn">生成命盘</button>
+    </form>
   </div>
 
-  <!-- 加载状态 -->
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <div id="loadingText">正在排盘计算中，请稍候…</div>
-  </div>
-
-  <!-- 错误信息 -->
-  <div class="error-msg" id="errorMsg"></div>
-
-  <!-- 结果展示 -->
-  <div class="result" id="result">
-    <div class="result-tabs">
-      <button class="result-tab active" id="tabPoster" onclick="switchTab('poster')">🎴 海报</button>
-      <button class="result-tab" id="tabAnalysis" onclick="switchTab('analysis')">📜 长文分析 <span class="badge" id="aiBadge" style="display:none">AI</span></button>
-    </div>
-
-    <div class="result-content active" id="panelPoster">
-      <div class="result-actions">
-        <button onclick="downloadHtml()">⬇ 下载海报</button>
-        <span style="font-size:11px;color:#a8a298;line-height:32px">右键海报可另存为</span>
-      </div>
-      <iframe id="resultFrame" sandbox="allow-scripts"></iframe>
-    </div>
-
-    <div class="result-content" id="panelAnalysis">
-      <div class="result-actions">
-        <button onclick="downloadMd()">⬇ 下载长文 (.md)</button>
-      </div>
-      <div id="analysisContent"></div>
-    </div>
-  </div>
-
-  <div class="footer">
-    基于 <a href="https://github.com/MarshaveYang/bazi-ziwei-skill" target="_blank">bazi-ziwei-skill</a> 算法层 ·
-    <span id="modeLabel">规则版</span> · 仅供文化研究参考
+    <p>正在排盘计算中，请稍候…</p>
+    <p style="font-size:11px;margin-top:8px;color:#a8a298;">AI 分析可能需要 15-30 秒</p>
   </div>
 </div>
 
 <script>
-let lastHtml = "";
-let lastMd = "";
-let mdDownloaded = false;
+let selectedAiMode = "none";
 
-// AI 提供商切换
-document.getElementById("aiProvider").addEventListener("change", function() {
-  document.getElementById("customModelRow").style.display = this.value === "custom" ? "flex" : "none";
-  if (this.value) {
-    document.getElementById("modeLabel").textContent = "规则+" + this.value.toUpperCase() + "版";
+function switchAiMode(mode) {
+  selectedAiMode = mode;
+  document.querySelectorAll(".ai-option").forEach(el => el.classList.remove("selected"));
+  document.getElementById("opt" + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add("selected");
+
+  const fields = document.getElementById("aiFields");
+  if (mode === "custom") {
+    fields.classList.add("visible");
   } else {
-    document.getElementById("modeLabel").textContent = "规则版";
+    fields.classList.remove("visible");
   }
-});
+}
 
-async function submitChart(e) {
-  e.preventDefault();
+function submitForm() {
   const btn = document.getElementById("submitBtn");
   const loading = document.getElementById("loading");
   const error = document.getElementById("errorMsg");
-  const result = document.getElementById("result");
 
   error.style.display = "none";
-  result.style.display = "none";
-  loading.style.display = "block";
   btn.disabled = true;
+  loading.style.display = "block";
 
-  const aiProvider = document.getElementById("aiProvider").value;
-  const hasAI = !!aiProvider;
-  document.getElementById("loadingText").textContent = hasAI
-    ? "排盘 + AI 长文分析中（约 15-30 秒）…"
-    : "正在排盘计算中，请稍候…";
+  const dateVal = document.getElementById("birthDate").value;
+  if (!dateVal) {
+    error.textContent = "请选择出生日期";
+    error.style.display = "block";
+    btn.disabled = false;
+    loading.style.display = "none";
+    return false;
+  }
+
+  const [year, month, day] = dateVal.split("-").map(Number);
+  const hour = parseInt(document.getElementById("birthHour").value);
+  const gender = document.getElementById("gender").value;
 
   const payload = {
-    year: parseInt(document.getElementById("year").value),
-    month: parseInt(document.getElementById("month").value),
-    day: parseInt(document.getElementById("day").value),
-    hour: parseInt(document.getElementById("hour").value),
-    minute: parseInt(document.getElementById("minute").value),
-    gender: document.getElementById("gender").value,
+    year, month, day, hour, minute: 0, gender,
+    aiMode: selectedAiMode
   };
 
-  // AI 参数
-  if (aiProvider) {
-    payload.aiProvider = aiProvider;
+  if (selectedAiMode === "custom") {
+    payload.aiProvider = document.getElementById("aiProvider").value || undefined;
     payload.aiApiKey = document.getElementById("aiApiKey").value || undefined;
-    if (aiProvider === "custom") {
-      payload.aiBaseUrl = document.getElementById("aiBaseUrl").value || undefined;
-      payload.aiModel = document.getElementById("aiModel").value || undefined;
-    }
+    payload.aiBaseUrl = document.getElementById("aiBaseUrl").value || undefined;
+    payload.aiModel = document.getElementById("aiModel").value || undefined;
   }
 
-  try {
-    const resp = await fetch("/api/chart", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+  (async () => {
+    try {
+      const resp = await fetch("/api/chart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-    if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.error || "请求失败");
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        throw new Error(errData.error || "请求失败 (" + resp.status + ")");
+      }
+
+      const data = await resp.json();
+      const posterHtml = data.html || "";
+
+      if (!posterHtml) {
+        throw new Error("海报生成失败");
+      }
+
+      // 在新窗口中打开海报
+      const blob = new Blob([posterHtml], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const w = window.open(url, "_blank");
+      if (!w) {
+        // 弹窗被拦截，回退到直接下载
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "bazi-ziwei-poster.html";
+        a.click();
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+    } catch (err) {
+      error.textContent = err.message || "网络错误，请重试";
+      error.style.display = "block";
+    } finally {
+      btn.disabled = false;
+      loading.style.display = "none";
     }
-
-    const data = await resp.json();
-    lastHtml = data.html || "";
-    lastMd = data.analysisMd || "";
-    mdDownloaded = false;
-
-    // 海报
-    if (lastHtml) {
-      const frame = document.getElementById("resultFrame");
-      frame.srcdoc = lastHtml;
-      frame.onload = () => {
-        try {
-          const h = frame.contentWindow.document.documentElement.scrollHeight;
-          frame.style.height = Math.max(600, Math.min(h, 2000)) + "px";
-        } catch(e) {}
-      };
-    }
-
-    // 长文
-    const analysisDiv = document.getElementById("analysisContent");
-    const aiBadge = document.getElementById("aiBadge");
-
-    if (lastMd && !lastMd.startsWith("⚠️")) {
-      aiBadge.style.display = "inline";
-      analysisDiv.innerHTML = "<div class='analysis-content'>" + renderMarkdown(lastMd) + "</div>";
-    } else if (lastMd && lastMd.startsWith("⚠️")) {
-      aiBadge.style.display = "none";
-      analysisDiv.innerHTML = "<div class='error-msg' style='display:block'>" + lastMd + "</div>";
-    } else {
-      aiBadge.style.display = "none";
-      analysisDiv.innerHTML = "<div class='no-ai-msg'><div class='icon'>🔮</div><p>未启用 AI 长文分析</p><p>如需深度分析，请在设置中输入 API Key</p></div>";
-    }
-
-    if (data.chart) {
-      const c = data.chart;
-      const summary = c.siZhu ? (c.siZhu.year?.gan||"")+(c.siZhu.year?.zhi||"")+" "+(c.siZhu.month?.gan||"")+(c.siZhu.month?.zhi||"")+" "+(c.siZhu.day?.gan||"")+(c.siZhu.day?.zhi||"")+" "+(c.siZhu.hour?.gan||"")+(c.siZhu.hour?.zhi||"") : "";
-      console.log("命盘: 日主" + c.dayMaster + " 格局:" + c.geju + " " + c.wangshuai + " " + c.mingGong);
-    }
-
-    result.style.display = "block";
-    switchTab(lastMd && !lastMd.startsWith("⚠️") ? "analysis" : "poster");
-    result.scrollIntoView({ behavior: "smooth", block: "start" });
-
-  } catch (err) {
-    error.textContent = err.message || "网络错误，请重试";
-    error.style.display = "block";
-  } finally {
-    loading.style.display = "none";
-    btn.disabled = false;
-  }
+  })();
 
   return false;
-}
-
-function switchTab(name) {
-  document.querySelectorAll(".result-tab").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".result-content").forEach(p => p.classList.remove("active"));
-  document.getElementById("tab" + name.charAt(0).toUpperCase() + name.slice(1)).classList.add("active");
-  document.getElementById("panel" + name.charAt(0).toUpperCase() + name.slice(1)).classList.add("active");
-}
-
-function downloadHtml() {
-  if (!lastHtml) return;
-  const blob = new Blob([lastHtml], { type: "text/html;charset=utf-8" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "bazi-ziwei-poster.html"; a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function downloadMd() {
-  if (!lastMd || lastMd.startsWith("⚠️")) return;
-  const blob = new Blob([lastMd], { type: "text/markdown;charset=utf-8" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "bazi-ziwei-analysis.md"; a.click();
-  URL.revokeObjectURL(a.href);
-  mdDownloaded = true;
-}
-
-// 简易 Markdown → HTML 渲染 (只渲染基本元素)
-function renderMarkdown(md) {
-  if (!md) return "";
-  let html = md
-    // Headers
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    // Horizontal rules
-    .replace(/^---$/gm, '<hr>')
-    // Bold
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // Italic
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Blockquote
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    // Confidence tags
-    .replace(/置信度：高/g, '<span class="confidence-high">置信度：高</span>')
-    .replace(/置信度：中/g, '<span class="confidence-mid">置信度：中</span>')
-    .replace(/置信度：低/g, '<span class="confidence-low">置信度：低</span>')
-    .replace(/置信度: 高/g, '<span class="confidence-high">置信度：高</span>')
-    .replace(/置信度: 中/g, '<span class="confidence-mid">置信度：中</span>')
-    .replace(/置信度: 低/g, '<span class="confidence-low">置信度：低</span>')
-    // Lists
-    .replace(/^(\d+)\.\s(.+)$/gm, '<li>$1. $2</li>')
-    .replace(/^-\s(.+)$/gm, '<li>$1</li>')
-    // Paragraphs (double newline)
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>');
-
-  html = '<p>' + html + '</p>';
-  // Fix nested list issues
-  html = html.replace(/<li>/g, '<li style="margin-left:20px">');
-  return html;
 }
 </script>
 </body>
