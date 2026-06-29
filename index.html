@@ -225,17 +225,16 @@ function submitForm() {
       }
 
       // 在新窗口中打开海报
-      const blob = new Blob([posterHtml], { type: "text/html;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const w = window.open(url, "_blank");
+      const w = window.open("", "_blank");
       if (!w) {
-        // 弹窗被拦截，回退到直接下载
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "bazi-ziwei-poster.html";
-        a.click();
+        error.textContent = "请允许弹窗后重试";
+        error.style.display = "block";
+        btn.disabled = false;
+        loading.style.display = "none";
+        return;
       }
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      w.document.write(posterHtml);
+      w.document.close();
 
     } catch (err) {
       error.textContent = err.message || "网络错误，请重试";
