@@ -73,12 +73,12 @@ function renderPoster(tpl,chart,analysis,aiMd){
   const cgHtml=(z)=>{const cg=bz.cangGan||{};const c=pls.map(p=>cg[p]||[]);const idx=pls.indexOf(z);return(c[idx]||[]).join("、")};
   for(const p of pls){
     d["bazi."+p+".gan"]=bz.siZhu[p]?.gan||"-"; d["bazi."+p+".zhi"]=bz.siZhu[p]?.zhi||"-";
-    d["bazi."+p+".naYin"]=bz.siZhu[p]?.nayin||"-"; d["bazi."+p+".shiShen"]=dm?ss(dm,bz.siZhu[p]?.gan):"-";
-    d["bazi."+p+".zhangSheng"]=bz.siZhu[p]?.changSheng||"-"; d["bazi."+p+".cangGanHtml"]=cgHtml(p);
+    d["bazi."+p+".naYin"]=bz.naYin?.[p]||"-"; d["bazi."+p+".shiShen"]=dm?ss(dm,bz.siZhu[p]?.gan):"-";
+    d["bazi."+p+".zhangSheng"]=bz.zhangSheng?.[p]||"-"; d["bazi."+p+".cangGanHtml"]=cgHtml(p);
     const z=bz.siZhu[p]?.zhi, dmWx=GAN_WX[dm], zWx=DIZHI_WX[z];
     d["bazi."+p+".ziZuo"]=dmWx&&zWx?(dmWx===zWx?"通根":({木:"水",火:"木",土:"火",金:"土",水:"金"}[dmWx]===zWx?"得生":"")):"-";
   }
-  d["bazi.dayunStart"]="-";
+  d["bazi.dayunStart"]=bz.dayunStart?String(bz.dayunStart):"-";
 
   const cf=analysis.conflicts||[];
   for(let i=0;i<3;i++){const c=cf[i]||{};d["conflicts."+i+".point"]=c.point||"";d["conflicts."+i+".bazi"]=c.bazi||"";d["conflicts."+i+".ziwei"]=c.ziwei||"";d["conflicts."+i+".impact"]=c.impact||"";d["conflicts."+i+".impact_class"]=c.impact_class||"";d["conflicts."+i+".advice"]=c.advice||""}
@@ -94,7 +94,7 @@ function renderPoster(tpl,chart,analysis,aiMd){
 
   // Gongs — use dizhi as key
   for(const g of zw.gongs){
-    const dz=DIZHI[g.dizhiIndex]||"-";
+    const dz=g.dizhi||"-";
     d["gongs."+dz+".name"]=(g.gong||"")+" "+dz;
     d["gongs."+dz+".mainStarsHtml"]=(g.mainStars||[]).map(s=>`<span class="star star-${s}">${s}</span>`).join("");
     d["gongs."+dz+".auxStars"]=(g.auxStars||[]).join(" ");
@@ -110,11 +110,11 @@ function renderPoster(tpl,chart,analysis,aiMd){
     d["gongs."+dz+".flag"]="";d["gongs."+dz+".daxian_range"]="";d["gongs."+dz+".shenBadge"]="";
   }
 
-  const dy=zw.dayun||[];
+  const dy=bz.dayun||[];
   for(let i=0;i<10;i++){
     const dd=dy[i]||{};
     d["dayun."+i+".gz"]=dd.ganZhi?(dd.ganZhi.gan||"")+(dd.ganZhi.zhi||""):"-";
-    d["dayun."+i+".shishen"]=dd.ganZhi?.gan&&dm?ss(dm,dd.ganZhi.gan):"-";
+    d["dayun."+i+".shishen"]=dd.ganShiShen||"-";
     d["dayun."+i+".age_range"]=dd.startYear&&dd.endYear?dd.startYear+"-"+dd.endYear:"-";
     d["dayun."+i+".current_class"]=dd.startYear<=cy&&dd.endYear>=cy?"current":"";
   }
@@ -138,9 +138,9 @@ function renderPoster(tpl,chart,analysis,aiMd){
   d["section_01.word_count"]=String(d["section_01.text"].length);
   d["section_02.conclusion"]="大运与紫微大限基本同步，当前"+cy+"年为关键节点。";
   for(let i=0;i<7;i++){d["section_02.bazi."+i+".gz"]="";d["section_02.bazi."+i+".range"]="";d["section_02.bazi."+i+".shishen"]="";d["section_02.ziwei."+i+".range"]="";d["section_02.bazi."+i+".current_class"]="";d["section_02.ziwei."+i+".current_class"]=""}
-  for(let i=0;i<Math.min(dy.length,7);i++){const dd=dy[i];d["section_02.bazi."+i+".gz"]=dd.ganZhi?(dd.ganZhi.gan||"")+(dd.ganZhi.zhi||""):"-";d["section_02.bazi."+i+".range"]=dd.startYear&&dd.endYear?dd.startYear+"-"+dd.endYear:"-";d["section_02.bazi."+i+".shishen"]=dd.ganZhi?.gan&&dm?ss(dm,dd.ganZhi.gan):"-";d["section_02.bazi."+i+".current_class"]=dd.startYear<=cy&&dd.endYear>=cy?"current":""}
+  for(let i=0;i<Math.min(dy.length,7);i++){const dd=dy[i];d["section_02.bazi."+i+".gz"]=dd.ganZhi?(dd.ganZhi.gan||"")+(dd.ganZhi.zhi||""):"-";d["section_02.bazi."+i+".range"]=dd.startYear&&dd.endYear?dd.startYear+"-"+dd.endYear:"-";d["section_02.bazi."+i+".shishen"]=dd.ganShiShen||"-";d["section_02.bazi."+i+".current_class"]=dd.startYear<=cy&&dd.endYear>=cy?"current":""}
 
-  d["final.life_axis"]="八字"+(en?.格局?.primary||"")+"格局 × 紫微"+(zw.gongs[zw.mingGongIndex]?.gong||"");
+  d["final.life_axis"]="八字"+(en?.格局?.primary||"")+"格局 × 紫微"+(zw.gongs[0]?.gong||"");
   for(let i=0;i<5;i++){d["final.nodes."+i+".age"]="";d["final.nodes."+i+".event"]="";d["final.nodes."+i+".year"]=""}
   for(let i=0;i<4;i++)d["final.advice."+i]="";
   for(let i=0;i<3;i++){d["final.risks."+i+".desc"]="";d["final.risks."+i+".range"]=""}
