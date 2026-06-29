@@ -4,7 +4,7 @@
   "private": true,
   "description": "八字+紫微斗数综合命盘生成器 — Cloudflare Pages 部署",
   "scripts": {
-    "build": "echo 'Static site, no build needed'",
+    "build": "npm install",
     "dev": "echo 'Run `npx wrangler pages dev` for local preview'"
   },
   "dependencies": {
