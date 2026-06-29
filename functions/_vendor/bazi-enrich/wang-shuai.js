@@ -1,10 +1,7 @@
-"use strict";
 // 旺衰判定 — 得令(月令) + 长生修正 + 得地(余三支) + 得势(余三干)
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.judgeWangShuai = judgeWangShuai;
-const tables_1 = require("./tables");
+import * as tables_1 from "./tables.js";
 // 月令(月支本气)对日干的关系打分
-function scoreMonthOrder(dayMaster, monthZhi) {
+export function scoreMonthOrder(dayMaster, monthZhi) {
     const cangGan = tables_1.ZHI_CANG_GAN[monthZhi];
     const benqi = cangGan[0].gan;
     const ss = (0, tables_1.getShiShen)(dayMaster, benqi);
@@ -58,7 +55,7 @@ function scoreMonthOrder(dayMaster, monthZhi) {
     };
 }
 // 日干在月支的长生位修正
-function scoreChangSheng(dayMaster, monthZhi) {
+export function scoreChangSheng(dayMaster, monthZhi) {
     const cs = (0, tables_1.getChangSheng)(dayMaster, monthZhi);
     let s = 0;
     if (cs === '长生' || cs === '帝旺')
@@ -74,7 +71,7 @@ function scoreChangSheng(dayMaster, monthZhi) {
     return { score: s, desc: `日主${dayMaster}在月支${monthZhi}为${cs} (${s >= 0 ? '+' : ''}${s})` };
 }
 // 得地: 年/日/时三支查同行/印的根
-function scoreGround(dayMaster, siZhu) {
+export function scoreGround(dayMaster, siZhu) {
     const desc = [];
     let total = 0;
     for (const p of ['年', '日', '时']) {
@@ -97,7 +94,7 @@ function scoreGround(dayMaster, siZhu) {
     return { score: total, desc };
 }
 // 得势: 年/月/时干
-function scoreStems(dayMaster, siZhu) {
+export function scoreStems(dayMaster, siZhu) {
     const desc = [];
     let total = 0;
     for (const p of ['年', '月', '时']) {
@@ -119,7 +116,7 @@ function scoreStems(dayMaster, siZhu) {
     }
     return { score: total, desc };
 }
-function judgeWangShuai(siZhu) {
+export function judgeWangShuai(siZhu) {
     const dm = siZhu.日.gan;
     const monthZhi = siZhu.月.zhi;
     const month = scoreMonthOrder(dm, monthZhi);

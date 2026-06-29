@@ -6,7 +6,7 @@
 /**
  * 构建系统提示词
  */
-function buildSystemPrompt() {
+export function buildSystemPrompt() {
   return `你是一位资深的国学易经术数综合分析师，精通子平派八字和紫微斗数。你的职责不是重新排盘，而是基于算法层给出的精确命盘数据，做两套体系的交叉印证分析。
 
 ## 分析要求
@@ -69,7 +69,7 @@ function buildSystemPrompt() {
 /**
  * 构建用户提示词（含完整命盘数据）
  */
-function buildUserPrompt(chartText, birthInfo, currentYear) {
+export function buildUserPrompt(chartText, birthInfo, currentYear) {
   return `请根据以下精确排盘数据，进行八字+紫微综合印证长文分析。
 
 ## 命主基本信息
@@ -90,7 +90,7 @@ ${chartText}
  * 获取 chart.txt 格式的文本盘
  * 从 chart JSON 生成类似 dump-text.ts 的文本
  */
-function chartToText(chart) {
+export function chartToText(chart) {
   const bz = chart.bazi;
   const zw = chart.ziwei;
   const en = bz.enrichment;
@@ -182,4 +182,4 @@ function chartToText(chart) {
   return lines.join('\n');
 }
 
-module.exports = { buildSystemPrompt, buildUserPrompt, chartToText };
+export { buildSystemPrompt, buildUserPrompt, chartToText };

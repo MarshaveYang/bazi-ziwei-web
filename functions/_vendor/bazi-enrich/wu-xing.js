@@ -1,10 +1,6 @@
-"use strict";
 // 五行统计 + 旺相休囚死
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.countWuXing = countWuXing;
-exports.wuXingMonthStatus = wuXingMonthStatus;
-const tables_1 = require("./tables");
-function countWuXing(siZhu, dayMaster) {
+import * as tables_1 from "./tables.js";
+export function countWuXing(siZhu, dayMaster) {
     const allWx = ['木', '火', '土', '金', '水'];
     const surface = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
     const withCangGan = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
@@ -43,6 +39,6 @@ function countWuXing(siZhu, dayMaster) {
     }
     return { surface, withCangGan, missing, strongest, shiShenGroups };
 }
-function wuXingMonthStatus(monthZhi) {
+export function wuXingMonthStatus(monthZhi) {
     return (0, tables_1.getWuXingMonthStatus)(monthZhi);
 }

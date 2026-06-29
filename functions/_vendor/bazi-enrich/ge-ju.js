@@ -1,8 +1,5 @@
-"use strict";
 // 格局判定 — 普通八格 + 建禄/月刃 + 特殊格局提示
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.judgeGeJu = judgeGeJu;
-const tables_1 = require("./tables");
+import * as tables_1 from "./tables.js";
 const SHI_SHEN_TO_GE = {
     比肩: '比肩格',
     劫财: '劫财格',
@@ -15,7 +12,7 @@ const SHI_SHEN_TO_GE = {
     偏印: '偏印格',
     正印: '正印格'
 };
-function judgeGeJu(siZhu) {
+export function judgeGeJu(siZhu) {
     const dm = siZhu.日.gan;
     const monthZhi = siZhu.月.zhi;
     const cangGan = tables_1.ZHI_CANG_GAN[monthZhi];

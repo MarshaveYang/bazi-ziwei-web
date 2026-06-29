@@ -1,13 +1,8 @@
-"use strict";
 // 八字排盘核心算法（使用lunar-javascript库）
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getZhiCangGanFull = getZhiCangGanFull;
-exports.createBaziChart = createBaziChart;
-exports.runBaziTests = runBaziTests;
-const lunar_typescript_1 = require("lunar-typescript");
-const zhangsheng_1 = require("./zhangsheng");
-const nayin_1 = require("./nayin");
-const jieqi_1 = require("./jieqi");
+import * as lunar_typescript_1 from "lunar-typescript";
+import * as zhangsheng_1 from "./zhangsheng.js";
+import * as nayin_1 from "./nayin.js";
+import * as jieqi_1 from "./jieqi.js";
 /**
  * 十神关系映射
  */
@@ -51,13 +46,13 @@ const DIZHI_CANGGAN_FULL = {
 /**
  * 获取十神关系
  */
-function getShiShen(dayGan, targetGan) {
+export function getShiShen(dayGan, targetGan) {
     return SHISHEN_MAP[dayGan]?.[targetGan] || '未知';
 }
 /**
  * 获取地支藏干主气
  */
-function getZhiCangGan(zhi) {
+export function getZhiCangGan(zhi) {
     return DIZHI_CANGGAN[zhi] || '未知';
 }
 /**
@@ -66,7 +61,7 @@ function getZhiCangGan(zhi) {
  * @param dayMaster 日主天干
  * @returns 藏干数组，每项包含天干和对应十神
  */
-function getZhiCangGanFull(zhi, dayMaster) {
+export function getZhiCangGanFull(zhi, dayMaster) {
     const cangGanList = DIZHI_CANGGAN_FULL[zhi] || [];
     return cangGanList.map((gan) => ({
         gan,
@@ -79,7 +74,7 @@ function getZhiCangGanFull(zhi, dayMaster) {
  * @param solar Solar对象
  * @returns 调整后的Solar对象（如果是晚子时）
  */
-function getAdjustedSolarForZiShi(solar) {
+export function getAdjustedSolarForZiShi(solar) {
     const hour = solar.getHour();
     // 如果是晚子时（23:00-24:00），使用第二天的日期计算日柱
     if (hour === 23) {
@@ -95,7 +90,7 @@ function getAdjustedSolarForZiShi(solar) {
  * @param birthInfo 生辰信息
  * @returns 八字排盘结果
  */
-function createBaziChart(birthInfo) {
+export function createBaziChart(birthInfo) {
     try {
         // 创建Solar对象（公历日期）
         const solar = lunar_typescript_1.Solar.fromYmdHms(birthInfo.year, birthInfo.month, birthInfo.day, birthInfo.hour, birthInfo.minute, 0);
@@ -205,7 +200,7 @@ function createBaziChart(birthInfo) {
 /**
  * 运行八字测试
  */
-function runBaziTests() {
+export function runBaziTests() {
     const testCases = [
         {
             name: '1979年5月4日6点男命（己年为阴年，男命逆排）',

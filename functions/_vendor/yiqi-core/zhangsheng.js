@@ -1,4 +1,3 @@
-"use strict";
 /**
  * 十二长生（星运）算法
  *
@@ -7,10 +6,6 @@
  *
  * 根据日干的五行属性，查找其在各地支的长生状态
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getChangSheng = getChangSheng;
-exports.getSiZhuChangSheng = getSiZhuChangSheng;
-exports.getChangShengLevel = getChangShengLevel;
 /**
  * 十二长生映射表
  * 根据天干十二长生表（见附件图片）
@@ -76,7 +71,7 @@ const CHANGSHENG_MAP = {
  * @param dizhi 地支
  * @returns 长生状态（长生、沐浴、冠带等）
  */
-function getChangSheng(tiangan, dizhi) {
+export function getChangSheng(tiangan, dizhi) {
     return CHANGSHENG_MAP[tiangan][dizhi];
 }
 /**
@@ -85,7 +80,7 @@ function getChangSheng(tiangan, dizhi) {
  * @param siZhu 四柱地支
  * @returns 四柱长生状态数组
  */
-function getSiZhuChangSheng(dayGan, siZhu) {
+export function getSiZhuChangSheng(dayGan, siZhu) {
     return {
         year: getChangSheng(dayGan, siZhu.year),
         month: getChangSheng(dayGan, siZhu.month),
@@ -98,7 +93,7 @@ function getSiZhuChangSheng(dayGan, siZhu) {
  * @param changsheng 长生状态
  * @returns 吉凶等级（1-5，5最吉）
  */
-function getChangShengLevel(changsheng) {
+export function getChangShengLevel(changsheng) {
     const levels = {
         '长生': 5, // 最吉
         '帝旺': 5, // 最吉

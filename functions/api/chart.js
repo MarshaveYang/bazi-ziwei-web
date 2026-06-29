@@ -9,10 +9,10 @@
  * }
  */
 
-const { createChart } = require("../_vendor/yiqi-core/index");
-const { enrichBazi } = require("../_vendor/bazi-enrich/enrich");
-const { generateAnalysis } = require("../_vendor/analysis-gen");
-const { buildSystemPrompt, buildUserPrompt, chartToText } = require("../_vendor/ai-prompts");
+import { createChart } from "../_vendor/yiqi-core/index.js";
+import { enrichBazi } from "../_vendor/bazi-enrich/enrich.js";
+import { generateAnalysis } from "../_vendor/analysis-gen.js";
+import { buildSystemPrompt, buildUserPrompt, chartToText } from "../_vendor/ai-prompts.js";
 
 // ======== 常量 ========
 const DIZHI = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
@@ -26,12 +26,12 @@ const PROVIDERS = {
 };
 
 // ======== 工具函数 ========
-function getShiShen(dm, g) { return SHI_SHEN_MAP[dm]?.[g] || ""; }
-function getYearGanZhi(year) { const gs=["庚","辛","壬","癸","甲","乙","丙","丁","戊","己"], zs=["申","酉","戌","亥","子","丑","寅","卯","辰","巳","午","未"]; return gs[year%10]+zs[year%12]; }
-function calcBarPct(v) { return {0:"0",1:"12",2:"25",3:"40",4:"55",5:"72",6:"88",7:"100"}[v] || String(Math.min(100,v*15)); }
+export function getShiShen(dm, g) { return SHI_SHEN_MAP[dm]?.[g] || ""; }
+export function getYearGanZhi(year) { const gs=["庚","辛","壬","癸","甲","乙","丙","丁","戊","己"], zs=["申","酉","戌","亥","子","丑","寅","卯","辰","巳","午","未"]; return gs[year%10]+zs[year%12]; }
+export function calcBarPct(v) { return {0:"0",1:"12",2:"25",3:"40",4:"55",5:"72",6:"88",7:"100"}[v] || String(Math.min(100,v*15)); }
 
 // ======== 海报渲染 ========
-function renderPoster(template, chart, analysis) {
+export function renderPoster(template, chart, analysis) {
   const data = {};
   const currentYear = new Date().getFullYear();
   const bi = chart.bazi.birthInfo, bz = chart.bazi, zw = chart.ziwei, en = bz.enrichment;
@@ -127,7 +127,7 @@ async function callAiApi(provider, apiKey, baseUrl, model, systemPrompt, userPro
 }
 
 // ======== 执行排盘 ========
-function doChart(birthInfo) {
+export function doChart(birthInfo) {
   const raw = createChart(birthInfo);
   const sia = { '年': raw.bazi.siZhu.year, '月': raw.bazi.siZhu.month, '日': raw.bazi.siZhu.day, '时': raw.bazi.siZhu.hour };
   raw.bazi.enrichment = enrichBazi(sia);
@@ -223,4 +223,4 @@ async function onRequest(context) {
   }
 }
 
-module.exports = { onRequest };
+export { onRequest };

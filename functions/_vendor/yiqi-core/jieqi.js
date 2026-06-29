@@ -1,21 +1,13 @@
-"use strict";
 // 节气计算模块
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.JIEQI_MONTHS = exports.JIEQI_NAMES = void 0;
-exports.calculateJieqi = calculateJieqi;
-exports.getJieqiMonth = getJieqiMonth;
-exports.getMonthGanZhi = getMonthGanZhi;
-exports.getAccurateMonthGanZhi = getAccurateMonthGanZhi;
-exports.getJieQiTime = getJieQiTime;
 // 24节气名称
-exports.JIEQI_NAMES = [
+export const JIEQI_NAMES = [;
     '小寒', '大寒', '立春', '雨水', '惊蛰', '春分',
     '清明', '谷雨', '立夏', '小满', '芒种', '夏至',
     '小暑', '大暑', '立秋', '处暑', '白露', '秋分',
     '寒露', '霜降', '立冬', '小雪', '大雪', '冬至'
 ];
 // 节气对应的地支月（立春开始为寅月）
-exports.JIEQI_MONTHS = [
+export const JIEQI_MONTHS = [;
     11, 11, 0, 0, 1, 1, // 小寒(子月), 大寒(子月), 立春(寅月), 雨水(寅月), 惊蛰(卯月), 春分(卯月)
     2, 2, 3, 3, 4, 4, // 清明(辰月), 谷雨(辰月), 立夏(巳月), 小满(巳月), 芒种(午月), 夏至(午月)
     5, 5, 6, 6, 7, 7, // 小暑(未月), 大暑(未月), 立秋(申月), 处暑(申月), 白露(酉月), 秋分(酉月)
@@ -27,7 +19,7 @@ exports.JIEQI_MONTHS = [
  * @param year 年份
  * @returns 24个节气的儒略日时刻
  */
-function calculateJieqi(year) {
+export function calculateJieqi(year) {
     const jieqiTimes = [];
     // 基础数据：2000年各节气的大致日期（儒略日）
     const base2000 = [
@@ -51,7 +43,7 @@ function calculateJieqi(year) {
  * @param day 日
  * @returns 地支月份的索引（0-11对应寅-丑）
  */
-function getJieqiMonth(year, month, day) {
+export function getJieqiMonth(year, month, day) {
     const jieqiTimes = calculateJieqi(year);
     // 计算当前日期的儒略日
     const a = Math.floor((14 - month) / 12);
@@ -64,7 +56,7 @@ function getJieqiMonth(year, month, day) {
         const jieqi = jieqiTimes[i];
         const nextJieqi = i + 2 < 24 ? jieqiTimes[i + 2] : jieqiTimes[2] + 365.25; // 下一个节气或明年立春
         if (currentJD >= jieqi && currentJD < nextJieqi) {
-            return exports.JIEQI_MONTHS[i];
+            return JIEQI_MONTHS[i];
         }
     }
     // 默认返回子月
@@ -77,7 +69,7 @@ function getJieqiMonth(year, month, day) {
  * @param day 日
  * @returns 月干支
  */
-function getMonthGanZhi(year, month, day) {
+export function getMonthGanZhi(year, month, day) {
     const jieqiMonth = getJieqiMonth(year, month, day);
     const yearGanIndex = (year - 4) % 10; // 使用修正后的年干算法
     // 月干推算：甲己之年丙作首（正月为丙寅）
@@ -102,7 +94,7 @@ function getMonthGanZhi(year, month, day) {
  * @param solar Solar对象（来自lunar-javascript）
  * @returns 月柱干支
  */
-function getAccurateMonthGanZhi(solar) {
+export function getAccurateMonthGanZhi(solar) {
     const lunar = solar.getLunar();
     // 获取lunar-javascript给出的月柱（默认在子时换月）
     const defaultMonthGZ = lunar.getMonthInGanZhi();
@@ -143,7 +135,7 @@ function getAccurateMonthGanZhi(solar) {
  * @param gz 干支字符串，如"甲子"
  * @returns 天干地支对象
  */
-function parseGanZhi(gz) {
+export function parseGanZhi(gz) {
     if (!gz || gz.length < 2) {
         throw new Error(`无效的干支字符串: ${gz}`);
     }
@@ -158,7 +150,7 @@ function parseGanZhi(gz) {
  * @param jieQiName 节气名称
  * @returns 节气的Solar对象，如果找不到返回null
  */
-function getJieQiTime(solar, jieQiName) {
+export function getJieQiTime(solar, jieQiName) {
     const lunar = solar.getLunar();
     const jieQiTable = lunar.getJieQiTable();
     return jieQiTable[jieQiName] || null;

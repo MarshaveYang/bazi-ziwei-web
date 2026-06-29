@@ -1,8 +1,5 @@
-"use strict";
 // 地支关系检测 — 刑冲合害、三合三会、暗合、拱合拱会
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.detectZhiRelations = detectZhiRelations;
-const tables_1 = require("./tables");
+import * as tables_1 from "./tables.js";
 // 六冲
 const LIU_CHONG = [
     ['子', '午'], ['丑', '未'], ['寅', '申'], ['卯', '酉'], ['辰', '戌'], ['巳', '亥']
@@ -41,7 +38,7 @@ const LIU_HAI = [
 const GAN_HE = {
     甲: '己', 己: '甲', 乙: '庚', 庚: '乙', 丙: '辛', 辛: '丙', 丁: '壬', 壬: '丁', 戊: '癸', 癸: '戊'
 };
-function detectZhiRelations(zhis) {
+export function detectZhiRelations(zhis) {
     const out = [];
     const pillars = ['年', '月', '日', '时'];
     const list = pillars.map(p => ({ pillar: p, zhi: zhis[p] }));
@@ -128,7 +125,7 @@ function detectZhiRelations(zhis) {
     // 暗合 — 地支藏干相合
     // 规则: 仅在该地支对没有其他显式关系(六冲/六合/六害/三合/三会/拱合/拱会/相刑)时才报暗合
     const explicitTypes = ['六冲', '六合', '六害', '三合', '三会', '拱合', '拱会', '相刑', '自刑'];
-    function hasExplicit(za, zb) {
+export     function hasExplicit(za, zb) {
         return out.some(r => explicitTypes.includes(r.type) &&
             r.zhi.includes(za) && r.zhi.includes(zb));
     }

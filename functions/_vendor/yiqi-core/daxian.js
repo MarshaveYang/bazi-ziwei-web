@@ -1,12 +1,4 @@
-"use strict";
 // 大运计算模块
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateDaXian = calculateDaXian;
-exports.getCurrentDaXian = getCurrentDaXian;
-exports.getDaXianForGong = getDaXianForGong;
-exports.calculateXuSui = calculateXuSui;
-exports.getLiuNianGanZhi = getLiuNianGanZhi;
-exports.getGongIndexByZhi = getGongIndexByZhi;
 /**
  * 天干数组
  */
@@ -23,7 +15,7 @@ const DIZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '�
  * @param currentAge 当前年龄（虚岁），用于标记当前大运
  * @returns 大运信息数组（10个大运）
  */
-function calculateDaXian(mingGongIndex, yinYang, wuXingJuNumber, currentAge = 0) {
+export function calculateDaXian(mingGongIndex, yinYang, wuXingJuNumber, currentAge = 0) {
     const daXianList = [];
     // 判断大运方向
     // 阳男、阴女：大限顺时针走（地支索引递增：丑→寅→卯...）
@@ -62,26 +54,26 @@ function calculateDaXian(mingGongIndex, yinYang, wuXingJuNumber, currentAge = 0)
 /**
  * 计算当前年龄的大运
  */
-function getCurrentDaXian(daXianList, age) {
+export function getCurrentDaXian(daXianList, age) {
     return daXianList.find(dx => age >= dx.startAge && age <= dx.endAge) || null;
 }
 /**
  * 获取宫位的大运信息
  */
-function getDaXianForGong(gongIndex, daXianList) {
+export function getDaXianForGong(gongIndex, daXianList) {
     return daXianList.find(dx => dx.gongIndex === gongIndex) || null;
 }
 /**
  * 计算虚岁
  */
-function calculateXuSui(birthYear, currentYear = new Date().getFullYear()) {
+export function calculateXuSui(birthYear, currentYear = new Date().getFullYear()) {
     return currentYear - birthYear + 1;
 }
 /**
  * 计算流年干支
  * @param year 公历年份
  */
-function getLiuNianGanZhi(year) {
+export function getLiuNianGanZhi(year) {
     const ganIndex = (year - 4) % 10; // 甲子年是1984年，1984-4=1980，1980%10=0
     const zhiIndex = (year - 4) % 12;
     return {
@@ -94,6 +86,6 @@ function getLiuNianGanZhi(year) {
  * @param zhi 地支
  * @returns 宫位索引（0=子，1=丑，...，11=亥）
  */
-function getGongIndexByZhi(zhi) {
+export function getGongIndexByZhi(zhi) {
     return DIZHI.indexOf(zhi);
 }

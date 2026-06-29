@@ -1,11 +1,7 @@
-"use strict";
 // 紫微斗数排盘核心算法（按照标准安星法重写）
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createZiweiChart = createZiweiChart;
-exports.runZiweiTests = runZiweiTests;
-const lunar_typescript_1 = require("lunar-typescript");
-const sihua_1 = require("./sihua");
-const daxian_1 = require("./daxian");
+import * as lunar_typescript_1 from "lunar-typescript";
+import * as sihua_1 from "./sihua.js";
+import * as daxian_1 from "./daxian.js";
 /**
  * 天干数组
  */
@@ -21,14 +17,14 @@ const GONG_NAMES = ['命宫', '兄弟', '夫妻', '子女', '财帛', '疾厄', 
 /**
  * 时辰转换为地支索引
  */
-function getHourZhiIndex(hour) {
+export function getHourZhiIndex(hour) {
     // 23-01:子(0), 01-03:丑(1), ..., 21-23:亥(11)
     return Math.floor((hour + 1) / 2) % 12;
 }
 /**
  * 判断阴阳男女
  */
-function getYinYang(year, gender) {
+export function getYinYang(year, gender) {
     const ganIndex = (year - 4) % 10; // 修正公式：2014年 → (2014-4)%10 = 0 → 甲
     const isYangYear = ganIndex % 2 === 0; // 甲丙戊庚壬为阳（索引0,2,4,6,8）
     if (gender === 'male') {
@@ -41,7 +37,7 @@ function getYinYang(year, gender) {
 /**
  * 五虎遁月诀 - 根据年干和月支确定月干
  */
-function getMonthGan(yearGan, monthZhi) {
+export function getMonthGan(yearGan, monthZhi) {
     const yearGanIndex = TIANGAN.indexOf(yearGan);
     const monthZhiIndex = DIZHI.indexOf(monthZhi);
     // 五虎遁月诀：甲己丙作首，乙庚戊为头，丙辛庚上起，丁壬壬寅流，戊癸甲寅求
@@ -64,7 +60,7 @@ function getMonthGan(yearGan, monthZhi) {
  * 标准算法：从寅宫起正月，顺数到生月；从生月宫当子时，逆时针数到生时
  * 例如：八月在酉宫，申时是第9个时辰（子丑寅卯辰巳午未申），从酉宫逆数8位到丑宫
  */
-function calculateMingGong(lunarMonth, hour) {
+export function calculateMingGong(lunarMonth, hour) {
     // 1. 从寅宫（索引2）起正月，顺时针数到生月
     // 正月在寅(2)，二月在卯(3)，...，八月在酉(9)
     const shengYueGongIndex = (2 + lunarMonth - 1) % 12;
@@ -80,7 +76,7 @@ function calculateMingGong(lunarMonth, hour) {
  * 标准算法：从寅宫起正月，顺数到生月；从生月宫当子时，顺时针数到生时
  * 例如：八月在酉宫，申时是第9个时辰，从酉宫顺数8位到巳宫
  */
-function calculateShenGong(lunarMonth, hour) {
+export function calculateShenGong(lunarMonth, hour) {
     // 1. 从寅宫（索引2）起正月，顺时针数到生月
     // 正月在寅(2)，二月在卯(3)，...，八月在酉(9)
     const shengYueGongIndex = (2 + lunarMonth - 1) % 12;
@@ -94,7 +90,7 @@ function calculateShenGong(lunarMonth, hour) {
 /**
  * 计算纳音五行局
  */
-function calculateWuXingJu(tiangan, dizhi) {
+export function calculateWuXingJu(tiangan, dizhi) {
     const ganNum = Math.floor(TIANGAN.indexOf(tiangan) / 2) + 1; // 甲乙=1, 丙丁=2...
     const zhiMap = {
         '子': 1, '丑': 1, '午': 1, '未': 1,
@@ -121,7 +117,7 @@ function calculateWuXingJu(tiangan, dizhi) {
  * 计算紫微星位置
  * 口诀：生日除局商为月，一自寅起紫微定。只加不减到整除，阳退阴进记心中。
  */
-function calculateZiweiPosition(lunarDay, juShu) {
+export function calculateZiweiPosition(lunarDay, juShu) {
     let shang = Math.floor(lunarDay / juShu);
     let yu = lunarDay % juShu;
     if (yu === 0) {
@@ -155,7 +151,7 @@ function calculateZiweiPosition(lunarDay, juShu) {
  * 安紫微星系
  * 口诀：紫微天机逆行旁，隔一阳武天同当，又隔二位廉贞地，空三复见紫微郞
  */
-function installZiweiSeries(ziweiPos) {
+export function installZiweiSeries(ziweiPos) {
     const stars = new Map();
     stars.set('紫微', ziweiPos);
     stars.set('天机', (ziweiPos - 1 + 12) % 12); // 逆时针下一宫
@@ -171,7 +167,7 @@ function installZiweiSeries(ziweiPos) {
  * 计算天府星位置
  * 口诀：天府南斗令，常对紫微君
  */
-function calculateTianfuPosition(ziweiPos) {
+export function calculateTianfuPosition(ziweiPos) {
     // 紫微天府对应关系
     const duiYing = {
         2: 2, 8: 8, // 寅申：紫府同宫
@@ -187,7 +183,7 @@ function calculateTianfuPosition(ziweiPos) {
  * 安天府星系
  * 口诀：天府太阴与贪狼，巨门天相及天梁，七杀空三破军位
  */
-function installTianfuSeries(tianfuPos) {
+export function installTianfuSeries(tianfuPos) {
     const stars = new Map();
     stars.set('天府', tianfuPos);
     stars.set('太阴', (tianfuPos + 1) % 12); // 顺时针下一宫
@@ -204,7 +200,7 @@ function installTianfuSeries(tianfuPos) {
  * 安辅星：左辅、右弼
  * 口诀：左辅辰宫起正月，顺数至生月；右弼戌宫起正月，逆数至生月
  */
-function installZuoYou(lunarMonth) {
+export function installZuoYou(lunarMonth) {
     const stars = new Map();
     // 左辅：辰宫起正月，顺时针数到生月
     const zuoFuPos = (4 + lunarMonth - 1) % 12;
@@ -218,7 +214,7 @@ function installZuoYou(lunarMonth) {
  * 安文昌、文曲
  * 口诀：文昌生时起戌位，逆数时辰至卯停；文曲生时起子位，逆数时辰至午停
  */
-function installWenXing(hour) {
+export function installWenXing(hour) {
     const stars = new Map();
     const hourZhiIndex = getHourZhiIndex(hour);
     // 文昌：戌宫起子时，逆时针数到生时
@@ -233,7 +229,7 @@ function installWenXing(hour) {
  * 安禄存、天马
  * 口诀：禄存按年干安星，天马按年支对宫三合
  */
-function installLuMa(yearGan, yearZhi) {
+export function installLuMa(yearGan, yearZhi) {
     const stars = new Map();
     // 禄存按年干：甲寅、乙卯、丙戊巳、丁己午、庚申、辛酉、壬亥、癸子
     const luCunMap = {
@@ -263,7 +259,7 @@ function installLuMa(yearGan, yearZhi) {
  * 安擎羊、陀罗
  * 口诀：擎羊禄前一位，陀罗禄后一位
  */
-function installYangTuo(yearGan) {
+export function installYangTuo(yearGan) {
     const stars = new Map();
     // 先找禄存位置
     const luCunMap = {
@@ -285,7 +281,7 @@ function installYangTuo(yearGan) {
  * 巳酉丑年生人火星在卯宫起子时，铃星在戌宫起子时，均顺时针数到生时
  * 亥卯未年生人火星在酉宫起子时，铃星在戌宫起子时，均顺时针数到生时
  */
-function installHuoLing(yearZhi, hour) {
+export function installHuoLing(yearZhi, hour) {
     const stars = new Map();
     const hourZhiIndex = getHourZhiIndex(hour);
     const zhiIndex = DIZHI.indexOf(yearZhi);
@@ -328,7 +324,7 @@ function installHuoLing(yearZhi, hour) {
  * 安地空、地劫
  * 口诀：地空亥宫起子时，逆数至生时；地劫亥宫起子时，顺数至生时
  */
-function installKongJie(hour) {
+export function installKongJie(hour) {
     const stars = new Map();
     const hourZhiIndex = getHourZhiIndex(hour);
     // 地空：亥宫起子时，逆数至生时
@@ -343,7 +339,7 @@ function installKongJie(hour) {
  * 安天魁、天钺
  * 口诀：按年干安星
  */
-function installKuiYue(yearGan) {
+export function installKuiYue(yearGan) {
     const stars = new Map();
     // 天魁定位
     // 口诀：甲戊庚牛羊，乙己鼠猴乡，丙丁猪鸡位，壬癸兔蛇藏，六辛逢马虎
@@ -379,7 +375,7 @@ function installKuiYue(yearGan) {
 /**
  * 创建紫微斗数排盘
  */
-function createZiweiChart(birthInfo) {
+export function createZiweiChart(birthInfo) {
     try {
         // 1. 转换为农历
         const solar = lunar_typescript_1.Solar.fromYmdHms(birthInfo.year, birthInfo.month, birthInfo.day, birthInfo.hour, birthInfo.minute, 0);
@@ -590,7 +586,7 @@ function createZiweiChart(birthInfo) {
         throw new Error('紫微斗数排盘计算失败: ' + error.message);
     }
 }
-function runZiweiTests() {
+export function runZiweiTests() {
     console.error('紫微斗数测试功能待实现');
     return { passed: 0, failed: 0, details: [] };
 }
@@ -598,7 +594,7 @@ function runZiweiTests() {
  * 安红鸾、天喜
  * 口诀：卯宫起子年，逆数至生年支；天喜为红鸾对宫
  */
-function installHongLuanTianXi(yearZhi) {
+export function installHongLuanTianXi(yearZhi) {
     const stars = new Map();
     const zhiIndex = DIZHI.indexOf(yearZhi);
     // 红鸾：卯宫起子年，逆数至生年支
@@ -613,7 +609,7 @@ function installHongLuanTianXi(yearZhi) {
  * 安天刑
  * 口诀：天刑酉上正月轮，数至生月便住脚
  */
-function installTianXing(lunarMonth) {
+export function installTianXing(lunarMonth) {
     const stars = new Map();
     // 天刑：酉宫起正月，顺数至生月
     const tianXingPos = (9 + lunarMonth - 1) % 12;
@@ -624,7 +620,7 @@ function installTianXing(lunarMonth) {
  * 安天姚
  * 口诀：天姚丑上顺正月，数至生月便住脚
  */
-function installTianYao(lunarMonth) {
+export function installTianYao(lunarMonth) {
     const stars = new Map();
     // 天姚：丑宫起正月，顺数至生月
     const tianYaoPos = (1 + lunarMonth - 1) % 12;

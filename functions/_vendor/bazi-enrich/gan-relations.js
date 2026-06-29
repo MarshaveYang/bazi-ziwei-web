@@ -1,13 +1,9 @@
-"use strict";
 // 天干关系 + 整柱盖头/截脚
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.detectGanRelations = detectGanRelations;
-exports.judgePillars = judgePillars;
-const tables_1 = require("./tables");
+import * as tables_1 from "./tables.js";
 const GAN_HE_PAIRS = [
     ['甲', '己', '土'], ['乙', '庚', '金'], ['丙', '辛', '水'], ['丁', '壬', '木'], ['戊', '癸', '火']
 ];
-function detectGanRelations(gans) {
+export function detectGanRelations(gans) {
     const out = [];
     const pillars = ['年', '月', '日', '时'];
     const list = pillars.map(p => ({ pillar: p, gan: gans[p] }));
@@ -29,7 +25,7 @@ function detectGanRelations(gans) {
     }
     return out;
 }
-function judgePillars(siZhu) {
+export function judgePillars(siZhu) {
     const pillars = ['年', '月', '日', '时'];
     return pillars.map(p => {
         const { gan, zhi } = siZhu[p];

@@ -1,11 +1,4 @@
-"use strict";
 // 紫微斗数四化系统
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSiHuaByGan = getSiHuaByGan;
-exports.calculateFeiHua = calculateFeiHua;
-exports.addBenMingSiHua = addBenMingSiHua;
-exports.getSiHuaColor = getSiHuaColor;
-exports.getSiHuaShort = getSiHuaShort;
 /**
  * 四化星曜（按年干）
  * 格式：{ 年干: { 化禄, 化权, 化科, 化忌 } }
@@ -25,7 +18,7 @@ const SIHUA_BY_YEAR_GAN = {
 /**
  * 获取指定天干的四化
  */
-function getSiHuaByGan(gan) {
+export function getSiHuaByGan(gan) {
     return SIHUA_BY_YEAR_GAN[gan];
 }
 /**
@@ -34,7 +27,7 @@ function getSiHuaByGan(gan) {
  * @param gongStars 宫位内的星曜列表
  * @returns 该宫位飞化出的四化星及其位置
  */
-function calculateFeiHua(gan, allGongs) {
+export function calculateFeiHua(gan, allGongs) {
     const sihua = getSiHuaByGan(gan);
     const result = {
         lu: null,
@@ -63,7 +56,7 @@ function calculateFeiHua(gan, allGongs) {
 /**
  * 为命盘添加本命四化（出生年干的四化）
  */
-function addBenMingSiHua(gongs, yearGan) {
+export function addBenMingSiHua(gongs, yearGan) {
     const sihua = getSiHuaByGan(yearGan);
     return gongs.map(gong => {
         const sihuaList = [];
@@ -92,7 +85,7 @@ function addBenMingSiHua(gongs, yearGan) {
 /**
  * 获取四化的颜色样式
  */
-function getSiHuaColor(hua) {
+export function getSiHuaColor(hua) {
     switch (hua) {
         case '化禄': return '#22c55e'; // 绿色
         case '化权': return '#a855f7'; // 紫色
@@ -104,7 +97,7 @@ function getSiHuaColor(hua) {
 /**
  * 获取四化的简称
  */
-function getSiHuaShort(hua) {
+export function getSiHuaShort(hua) {
     switch (hua) {
         case '化禄': return '禄';
         case '化权': return '权';

@@ -1,15 +1,12 @@
-"use strict";
 // 八字增强分析主入口 — 给定四柱, 输出格局/旺衰/刑冲合害/调候/自坐 等所有 Yiqi 未算的字段
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.enrichBazi = enrichBazi;
-const tables_1 = require("./tables");
-const zhi_relations_1 = require("./zhi-relations");
-const gan_relations_1 = require("./gan-relations");
-const wu_xing_1 = require("./wu-xing");
-const wang_shuai_1 = require("./wang-shuai");
-const ge_ju_1 = require("./ge-ju");
-const tiao_hou_1 = require("./tiao-hou");
-function enrichBazi(siZhu) {
+import * as tables_1 from "./tables.js";
+import * as zhi_relations_1 from "./zhi-relations.js";
+import * as gan_relations_1 from "./gan-relations.js";
+import * as wu_xing_1 from "./wu-xing.js";
+import * as wang_shuai_1 from "./wang-shuai.js";
+import * as ge_ju_1 from "./ge-ju.js";
+import * as tiao_hou_1 from "./tiao-hou.js";
+export function enrichBazi(siZhu) {
     const dm = siZhu.日.gan;
     const monthZhi = siZhu.月.zhi;
     // 自坐 — 每柱干在自身支的长生位

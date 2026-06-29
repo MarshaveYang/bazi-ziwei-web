@@ -1,25 +1,19 @@
-"use strict";
 // 八字基础查表 — 所有五行/十神/长生/调候底层数据
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TIAO_HOU = exports.ZHI_CANG_GAN = exports.ZHI_WUXING = exports.GAN_YINYANG = exports.GAN_WUXING = exports.DIZHI = exports.TIANGAN = void 0;
-exports.shengKe = shengKe;
-exports.getShiShen = getShiShen;
-exports.getChangSheng = getChangSheng;
-exports.getWuXingMonthStatus = getWuXingMonthStatus;
-exports.TIANGAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-exports.DIZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-exports.GAN_WUXING = {
+
+export const TIANGAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
+export const DIZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
+export const GAN_WUXING = {
     甲: '木', 乙: '木', 丙: '火', 丁: '火', 戊: '土', 己: '土', 庚: '金', 辛: '金', 壬: '水', 癸: '水'
 };
-exports.GAN_YINYANG = {
+export const GAN_YINYANG = {
     甲: '阳', 乙: '阴', 丙: '阳', 丁: '阴', 戊: '阳', 己: '阴', 庚: '阳', 辛: '阴', 壬: '阳', 癸: '阴'
 };
-exports.ZHI_WUXING = {
+export const ZHI_WUXING = {
     子: '水', 丑: '土', 寅: '木', 卯: '木', 辰: '土', 巳: '火', 午: '火', 未: '土', 申: '金', 酉: '金', 戌: '土', 亥: '水'
 };
 // 地支藏干 — 本气、中气、余气
 // [{gan, role}] 顺序：本气、中气、余气
-exports.ZHI_CANG_GAN = {
+export const ZHI_CANG_GAN = {
     子: [{ gan: '癸', role: '本气' }],
     丑: [{ gan: '己', role: '本气' }, { gan: '癸', role: '中气' }, { gan: '辛', role: '余气' }],
     寅: [{ gan: '甲', role: '本气' }, { gan: '丙', role: '中气' }, { gan: '戊', role: '余气' }],
@@ -34,7 +28,7 @@ exports.ZHI_CANG_GAN = {
     亥: [{ gan: '壬', role: '本气' }, { gan: '甲', role: '中气' }]
 };
 // 五行生克
-function shengKe(a, b) {
+export function shengKe(a, b) {
     if (a === b)
         return '同';
     const sheng = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
@@ -50,11 +44,11 @@ function shengKe(a, b) {
     return '同'; // unreachable
 }
 // 十神 — 以日干为基准对其他天干
-function getShiShen(dayMaster, target) {
-    const dmWx = exports.GAN_WUXING[dayMaster];
-    const dmYy = exports.GAN_YINYANG[dayMaster];
-    const tWx = exports.GAN_WUXING[target];
-    const tYy = exports.GAN_YINYANG[target];
+export function getShiShen(dayMaster, target) {
+    const dmWx = GAN_WUXING[dayMaster];
+    const dmYy = GAN_YINYANG[dayMaster];
+    const tWx = GAN_WUXING[target];
+    const tYy = GAN_YINYANG[target];
     const sameYy = dmYy === tYy;
     const rel = shengKe(dmWx, tWx);
     switch (rel) {
@@ -72,11 +66,11 @@ const CHANG_SHENG_START = {
     乙: '午', 丁: '酉', 己: '酉', 辛: '子', 癸: '卯'
 };
 const CHANG_SHENG_ORDER = ['长生', '沐浴', '冠带', '临官', '帝旺', '衰', '病', '死', '墓', '绝', '胎', '养'];
-function getChangSheng(gan, zhi) {
+export function getChangSheng(gan, zhi) {
     const start = CHANG_SHENG_START[gan];
-    const startIdx = exports.DIZHI.indexOf(start);
-    const zhiIdx = exports.DIZHI.indexOf(zhi);
-    const forward = exports.GAN_YINYANG[gan] === '阳';
+    const startIdx = DIZHI.indexOf(start);
+    const zhiIdx = DIZHI.indexOf(zhi);
+    const forward = GAN_YINYANG[gan] === '阳';
     let step;
     if (forward) {
         step = (zhiIdx - startIdx + 12) % 12;
@@ -89,7 +83,7 @@ function getChangSheng(gan, zhi) {
 // 调候用神 — 穷通宝鉴 120 格 (日干 × 月支)
 // 每格 1-3 字, 主用神在前
 // 注: 这是子平派主流取用法, 不同流派有微调
-exports.TIAO_HOU = {
+export const TIAO_HOU = {
     // 甲木
     甲: {
         子: ['丁', '庚', '丙'], 丑: ['丁', '庚', '丙'], 寅: ['丙', '癸'],
@@ -162,8 +156,8 @@ exports.TIAO_HOU = {
     }
 };
 // 月令旺相休囚死 — 五行随月令的状态
-function getWuXingMonthStatus(monthZhi) {
-    const monthWx = exports.ZHI_WUXING[monthZhi];
+export function getWuXingMonthStatus(monthZhi) {
+    const monthWx = ZHI_WUXING[monthZhi];
     // 当令=旺; 当令所生=相; 生当令者=休; 克当令者=囚; 当令所克=死
     const result = {};
     const allWx = ['木', '火', '土', '金', '水'];

@@ -1,4 +1,3 @@
-"use strict";
 /**
  * 纳音五行算法
  *
@@ -12,11 +11,6 @@
  * - 火：炉中火、山头火、霹雳火、山下火、覆灯火、天上火
  * - 土：城头土、屋上土、壁上土、大驿土、沙中土、路旁土
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNaYin = getNaYin;
-exports.getSiZhuNaYin = getSiZhuNaYin;
-exports.getNaYinWuXing = getNaYinWuXing;
-exports.getNaYinRelation = getNaYinRelation;
 /**
  * 纳音映射表
  * 根据干支组合查找对应的纳音五行
@@ -66,7 +60,7 @@ const NAYIN_MAP = {
  * @param dizhi 地支
  * @returns 纳音五行
  */
-function getNaYin(tiangan, dizhi) {
+export function getNaYin(tiangan, dizhi) {
     const key = tiangan + dizhi;
     const nayin = NAYIN_MAP[key];
     if (!nayin) {
@@ -80,7 +74,7 @@ function getNaYin(tiangan, dizhi) {
  * @param siZhu 四柱干支
  * @returns 四柱纳音数组
  */
-function getSiZhuNaYin(siZhu) {
+export function getSiZhuNaYin(siZhu) {
     return {
         year: getNaYin(siZhu.year.gan, siZhu.year.zhi),
         month: getNaYin(siZhu.month.gan, siZhu.month.zhi),
@@ -93,7 +87,7 @@ function getSiZhuNaYin(siZhu) {
  * @param nayin 纳音
  * @returns 五行属性（金木水火土）
  */
-function getNaYinWuXing(nayin) {
+export function getNaYinWuXing(nayin) {
     if (nayin.includes('金'))
         return '金';
     if (nayin.includes('木'))
@@ -112,7 +106,7 @@ function getNaYinWuXing(nayin) {
  * @param nayin2 纳音2
  * @returns 关系（生、克、比和）
  */
-function getNaYinRelation(nayin1, nayin2) {
+export function getNaYinRelation(nayin1, nayin2) {
     const wx1 = getNaYinWuXing(nayin1);
     const wx2 = getNaYinWuXing(nayin2);
     if (wx1 === wx2)

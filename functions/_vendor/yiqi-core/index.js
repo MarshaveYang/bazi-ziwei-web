@@ -1,19 +1,12 @@
-"use strict";
 // 统一排盘接口
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.EXAMPLE_BIRTH_INFO = void 0;
-exports.createChart = createChart;
-exports.validateBirthInfo = validateBirthInfo;
-exports.runAllTests = runAllTests;
-exports.formatChartResult = formatChartResult;
-const bazi_1 = require("./bazi");
-const ziwei_standard_1 = require("./ziwei-standard");
+import * as bazi_1 from "./bazi.js";
+import * as ziwei_standard_1 from "./ziwei-standard.js";
 /**
  * 创建完整的排盘（八字 + 紫微斗数）
  * @param birthInfo 生辰信息
  * @returns 完整排盘结果
  */
-function createChart(birthInfo) {
+export function createChart(birthInfo) {
     try {
         const bazi = (0, bazi_1.createBaziChart)(birthInfo);
         const ziwei = (0, ziwei_standard_1.createZiweiChart)(birthInfo);
@@ -31,7 +24,7 @@ function createChart(birthInfo) {
  * @param birthInfo 生辰信息
  * @returns 验证结果
  */
-function validateBirthInfo(birthInfo) {
+export function validateBirthInfo(birthInfo) {
     const errors = [];
     // 验证年份
     if (birthInfo.year < 1900 || birthInfo.year > 2100) {
@@ -78,7 +71,7 @@ function validateBirthInfo(birthInfo) {
  * 运行所有算法测试
  * @returns 综合测试结果
  */
-function runAllTests() {
+export function runAllTests() {
     const baziResults = (0, bazi_1.runBaziTests)();
     const ziweiResults = (0, ziwei_standard_1.runZiweiTests)();
     const totalPassed = baziResults.passed + ziweiResults.passed;
@@ -98,7 +91,7 @@ function runAllTests() {
  * @param chart 排盘结果
  * @returns 格式化的字符串
  */
-function formatChartResult(chart) {
+export function formatChartResult(chart) {
     let result = '=== 排盘结果 ===\n\n';
     // 八字部分
     result += '【八字排盘】\n';
@@ -130,7 +123,7 @@ function formatChartResult(chart) {
     return result;
 }
 // 导出示例用法
-exports.EXAMPLE_BIRTH_INFO = {
+export const EXAMPLE_BIRTH_INFO = {
     year: 1990,
     month: 5,
     day: 15,
