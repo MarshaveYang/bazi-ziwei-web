@@ -235,7 +235,7 @@ function renderPoster(tpl,chart,ana,aiMd){
   // 渲染：原来是对每个 key 都生成一个正则、对整段 HTML 扫描一次（O(key数 × HTML长度)，
   // 字段有上百个时比较浪费）。改成一次性扫描所有 {{xxx}} 占位符，回调里直接查字典，
   // 整个模板只扫描一遍。
-  let html=tpl.replace(/\{\{([a-zA-Z0-9_.]+)\}\}/g,(_,k)=>Object.prototype.hasOwnProperty.call(d,k)?d[k]:"-");
+  let html=tpl.replace(/\{\{([^{}]+)\}\}/g,(_,k)=>Object.prototype.hasOwnProperty.call(d,k)?d[k]:"-");
 
 
   if(aiMd){
