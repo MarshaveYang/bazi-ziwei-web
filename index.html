@@ -71,7 +71,6 @@
           <label>出生日期（公历）</label>
           <input type="date" id="birthDate" required>
         </div>
-        <div class="form-group" aria-hidden="true"></div>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -191,7 +190,23 @@ function submitForm() {
     return false;
   }
 
-  const [year, month, day] = dateVal.split("-").map(Number);
+  const [yearRaw, month, day] = dateVal.split("-").map(Number);
+  const currentYear = new Date().getFullYear();
+  let year = yearRaw;
+
+  // 客户端先做年份合法性校验，不合法就自动修正并提示，
+  // 本次提交直接终止（不发请求、不弹新窗口），用户确认后需要再点一次"生成命盘"
+  if (year > currentYear || year < 1900) {
+    year = year > currentYear ? currentYear : 1900;
+    const fixedDate = String(year).padStart(4, "0") + "-" + String(month).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+    document.getElementById("birthDate").value = fixedDate;
+    error.textContent = "出生年份不合法，已自动修正为 " + year + " 年，请确认后重新点击「生成命盘」";
+    error.style.display = "block";
+    btn.disabled = false;
+    loading.style.display = "none";
+    return false;
+  }
+
   const hour = parseInt(document.getElementById("birthHour").value);
   const gender = document.getElementById("gender").value;
 
