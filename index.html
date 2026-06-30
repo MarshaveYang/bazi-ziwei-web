@@ -17,7 +17,7 @@
   .sub { text-align: center; color: #6b6660; font-size: 13px; margin-bottom: 28px; letter-spacing: 1px; }
   .card { background: #faf6ec; border: 1px solid #c4bdb0; border-radius: 8px; padding: 28px 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 16px; }
   .card-title { font-size: 14px; color: #8b2f1e; letter-spacing: 2px; margin-bottom: 16px; border-bottom: 1px solid #e0d9c8; padding-bottom: 8px; }
-  .form-row { display: flex; gap: 12px; margin-bottom: 14px; }
+  .form-row { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
   .form-group { flex: 1; }
   .form-group label { display: block; font-size: 11px; color: #6b6660; margin-bottom: 3px; letter-spacing: 1px; }
   .form-group input, .form-group select {
@@ -67,10 +67,12 @@
     <div class="card-title">📅 生辰信息</div>
     <form id="chartForm" onsubmit="return submitForm()">
       <div class="form-row">
-        <div class="form-group" style="flex:2">
+        <div class="form-group" style="flex:1">
           <label>出生日期（公历）</label>
           <input type="date" id="birthDate" required>
         </div>
+      </div>
+      <div class="form-row">
         <div class="form-group">
           <label>时辰</label>
           <select id="birthHour" required>

@@ -82,6 +82,28 @@ function renderPoster(tpl,chart,ana,aiMd){
   // dayunStart
   s(d,"bazi.dayunStart",bz.dayunStart);
 
+
+  // === GONGS (十二宫盘, organized by dizhi) ===
+  for(const dz of DIZHI){
+    const g=zw.gongs.find(gg=>gg.dizhi===dz);
+    if(g){
+      s(d,"gongs."+dz+".name",(g.gong||""));
+      s(d,"gongs."+dz+".mainStarsHtml",(g.mainStars||[]).map(s=>'<span class="star star-'+s+'">'+s+'</span>').join(""));
+      s(d,"gongs."+dz+".auxStars",(g.auxStars||[]).join(" "));
+      s(d,"gongs."+dz+".sihua",(g.sihua||[]).map(x=>x.hua||"").join(" "));
+      s(d,"gongs."+dz+".ganzhi",(g.tiangan||"")+(g.dizhi||""));
+      const dx=g.daXian;
+      s(d,"gongs."+dz+".daxian_range",dx?dx.startAge+"-"+dx.endAge+"岁":"");
+      s(d,"gongs."+dz+".flag",dx?.isCurrent?"current":"");
+      s(d,"gongs."+dz+".shenBadge",zw.shenGongIndex!==undefined&&zw.gongs[zw.shenGongIndex]?.dizhi===dz?'<span class="shen-badge">身</span>':"");
+      s(d,"gongs."+dz+".smallStars","");
+    }else{
+      s(d,"gongs."+dz+".name","");s(d,"gongs."+dz+".mainStarsHtml","");s(d,"gongs."+dz+".auxStars","");
+      s(d,"gongs."+dz+".sihua","");s(d,"gongs."+dz+".ganzhi",dz);s(d,"gongs."+dz+".daxian_range","");
+      s(d,"gongs."+dz+".flag","");s(d,"gongs."+dz+".shenBadge","");s(d,"gongs."+dz+".smallStars","");
+    }
+  }
+
   // === DAYUN STRIP (10 steps) ===
   const dayun=bz.dayun||[];
   const curAge=cy-bi.year+1;
@@ -139,11 +161,12 @@ function renderPoster(tpl,chart,ana,aiMd){
     }else{
       s(d,"section_02.bazi."+i+".range","");s(d,"section_02.bazi."+i+".gz","");s(d,"section_02.bazi."+i+".shishen","");s(d,"section_02.bazi."+i+".current_class","");
     }
-    // Ziwei 大限 (use gongs array in order)
-    const g=zw.gongs?.[i];
-    if(g?.daXian){
-      s(d,"section_02.ziwei."+i+".range",g.daXian.startAge+"-"+g.daXian.endAge+"岁");
-      s(d,"section_02.ziwei."+i+".current_class",g.daXian.isCurrent?"current":"");
+    // Ziwei 大限 (sorted by startAge chronologically)
+    const ziweiSorted=(zw.gongs||[]).filter(g=>g.daXian).sort((a,b)=>(a.daXian.startAge||0)-(b.daXian.startAge||0));
+    const zg=ziweiSorted[i];
+    if(zg?.daXian){
+      s(d,"section_02.ziwei."+i+".range",zg.daXian.startAge+"-"+zg.daXian.endAge+"岁");
+      s(d,"section_02.ziwei."+i+".current_class",zg.daXian.isCurrent?"current":"");
     }else{
       s(d,"section_02.ziwei."+i+".range","");s(d,"section_02.ziwei."+i+".current_class","");
     }
