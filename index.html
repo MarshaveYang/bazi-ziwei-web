@@ -18,10 +18,10 @@
   .card { background: #faf6ec; border: 1px solid #c4bdb0; border-radius: 8px; padding: 28px 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 16px; }
   .card-title { font-size: 14px; color: #8b2f1e; letter-spacing: 2px; margin-bottom: 16px; border-bottom: 1px solid #e0d9c8; padding-bottom: 8px; }
   .form-row { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
-  .form-group { flex: 1; }
+  .form-group { flex: 1; min-width: 0; }
   .form-group label { display: block; font-size: 11px; color: #6b6660; margin-bottom: 3px; letter-spacing: 1px; }
   .form-group input, .form-group select {
-    width: 100%; padding: 9px 10px; border: 1px solid #c4bdb0; border-radius: 6px;
+    width: 100%; min-width: 0; box-sizing: border-box; padding: 9px 10px; border: 1px solid #c4bdb0; border-radius: 6px;
     background: #fffcf5; font-size: 14px; font-family: inherit; color: #2b2825;
   }
   .form-group input:focus, .form-group select:focus { outline: none; border-color: #8b2f1e; }
@@ -30,6 +30,15 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6660'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
   }
+  .date-select-row { display: flex; gap: 8px; }
+  .date-select-row select {
+    width: 100%; min-width: 0; box-sizing: border-box; padding: 9px 10px; border: 1px solid #c4bdb0; border-radius: 6px;
+    background: #fffcf5; font-size: 14px; font-family: inherit; color: #2b2825;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6660'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center; padding-right: 22px;
+  }
+  .date-select-row select:focus { outline: none; border-color: #8b2f1e; }
 
   .btn-submit {
     width: 100%; padding: 14px; background: #8b2f1e; color: #fff; border: none; border-radius: 6px;
@@ -69,9 +78,12 @@
       <div class="form-row">
         <div class="form-group">
           <label>出生日期（公历）</label>
-          <input type="date" id="birthDate" required>
+          <div class="date-select-row">
+            <select id="birthYear" required></select>
+            <select id="birthMonth" required></select>
+            <select id="birthDay" required></select>
+          </div>
         </div>
-        <div class="form-group" aria-hidden="true"></div>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -160,6 +172,56 @@
 <script>
 let selectedAiMode = "none";
 
+// 初始化出生日期的 年/月/日 三个下拉框（替代原生 input type=date，避免不同浏览器渲染不一致）
+function initDateSelects() {
+  const currentYear = new Date().getFullYear();
+  const yearSel = document.getElementById("birthYear");
+  const monthSel = document.getElementById("birthMonth");
+  const daySel = document.getElementById("birthDay");
+
+  for (let y = currentYear; y >= 1900; y--) {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y + "年";
+    yearSel.appendChild(opt);
+  }
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement("option");
+    opt.value = m;
+    opt.textContent = m + "月";
+    monthSel.appendChild(opt);
+  }
+
+  function daysInMonth(year, month) {
+    return new Date(year, month, 0).getDate();
+  }
+
+  function refreshDays() {
+    const year = parseInt(yearSel.value);
+    const month = parseInt(monthSel.value);
+    const prevDay = parseInt(daySel.value) || 1;
+    const maxDay = daysInMonth(year, month);
+    daySel.innerHTML = "";
+    for (let d = 1; d <= maxDay; d++) {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d + "日";
+      daySel.appendChild(opt);
+    }
+    daySel.value = Math.min(prevDay, maxDay);
+  }
+
+  // 默认值：当前年份往前 30 年（更贴近常见使用场景），可自行调整
+  yearSel.value = Math.max(1900, currentYear - 30);
+  monthSel.value = 1;
+  refreshDays();
+  daySel.value = 1;
+
+  yearSel.addEventListener("change", refreshDays);
+  monthSel.addEventListener("change", refreshDays);
+}
+initDateSelects();
+
 function switchAiMode(mode) {
   selectedAiMode = mode;
   document.querySelectorAll(".ai-option").forEach(el => el.classList.remove("selected"));
@@ -182,16 +244,10 @@ function submitForm() {
   btn.disabled = true;
   loading.style.display = "block";
 
-  const dateVal = document.getElementById("birthDate").value;
-  if (!dateVal) {
-    error.textContent = "请选择出生日期";
-    error.style.display = "block";
-    btn.disabled = false;
-    loading.style.display = "none";
-    return false;
-  }
+  const year = parseInt(document.getElementById("birthYear").value);
+  const month = parseInt(document.getElementById("birthMonth").value);
+  const day = parseInt(document.getElementById("birthDay").value);
 
-  const [year, month, day] = dateVal.split("-").map(Number);
   const hour = parseInt(document.getElementById("birthHour").value);
   const gender = document.getElementById("gender").value;
 
